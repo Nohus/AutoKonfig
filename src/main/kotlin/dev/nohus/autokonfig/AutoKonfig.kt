@@ -41,14 +41,8 @@ class AutoKonfig {
             return delegateProvider(fullName)
         }
     }
-    internal inner class StringSettingProvider(default: String?, name: String?, group: Group?)
-        : SettingProvider<String>({ StringSettingDelegate(it, default) }, default != null, name, group)
-    internal inner class BooleanSettingProvider(default: Boolean?, name: String?, group: Group?)
-        : SettingProvider<Boolean>({ BooleanSettingDelegate(it, default) }, default != null, name, group)
-    internal inner class IntSettingProvider(default: Int?, name: String?, group: Group?)
-        : SettingProvider<Int>({ IntSettingDelegate(it, default) }, default != null, name, group)
 
-    abstract inner class SettingDelegate<T>(
+    inner class SettingDelegate<T>(
         private val key: String,
         private val transform: (String) -> T,
         private val default: T?
@@ -68,11 +62,24 @@ class AutoKonfig {
 
         override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = getValue()
     }
-    internal inner class StringSettingDelegate(key: String, default: String?) : SettingDelegate<String>(key, ::mapString, default)
-    internal inner class BooleanSettingDelegate(key: String, default: Boolean?) : SettingDelegate<Boolean>(key, ::mapBoolean, default)
-    internal inner class IntSettingDelegate(key: String, default: Int?) : SettingDelegate<Int>(key, ::mapInt, default)
+
+    internal inner class StringSettingProvider(default: String?, name: String?, group: Group?)
+        : SettingProvider<String>({ SettingDelegate(it, ::mapString, default) }, default != null, name, group)
+    internal inner class BooleanSettingProvider(default: Boolean?, name: String?, group: Group?)
+        : SettingProvider<Boolean>({ SettingDelegate(it, ::mapBoolean, default) }, default != null, name, group)
+    internal inner class IntSettingProvider(default: Int?, name: String?, group: Group?)
+        : SettingProvider<Int>({ SettingDelegate(it, ::mapInt, default) }, default != null, name, group)
+    internal inner class LongSettingProvider(default: Long?, name: String?, group: Group?)
+        : SettingProvider<Long>({ SettingDelegate(it, ::mapLong, default) }, default != null, name, group)
+    internal inner class FloatSettingProvider(default: Float?, name: String?, group: Group?)
+        : SettingProvider<Float>({ SettingDelegate(it, ::mapFloat, default) }, default != null, name, group)
+    internal inner class DoubleSettingProvider(default: Double?, name: String?, group: Group?)
+        : SettingProvider<Double>({ SettingDelegate(it, ::mapDouble, default) }, default != null, name, group)
 
     private fun mapString(value: String) = value
     private fun mapBoolean(value: String) = value in listOf("true", "yes", "1")
     private fun mapInt(value: String) = value.toInt()
+    private fun mapLong(value: String) = value.toLong()
+    private fun mapFloat(value: String) = value.toFloat()
+    private fun mapDouble(value: String) = value.toDouble()
 }

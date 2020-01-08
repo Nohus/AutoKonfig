@@ -13,6 +13,9 @@ import dev.nohus.autokonfig.AutoKonfig.SettingProvider
  */
 fun AutoKonfig.StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = this.StringSettingProvider(default, name, null)
 fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = this.IntSettingProvider(default, name, null)
+fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = this.LongSettingProvider(default, name, null)
+fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = this.FloatSettingProvider(default, name, null)
+fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = this.DoubleSettingProvider(default, name, null)
 fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = this.BooleanSettingProvider(default, name, null)
 fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, name)
 
@@ -21,6 +24,9 @@ fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, na
  */
 fun StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = DefaultAutoKonfig.StringSetting(default, name)
 fun IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = DefaultAutoKonfig.IntSetting(default, name)
+fun LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = DefaultAutoKonfig.LongSetting(default, name)
+fun FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = DefaultAutoKonfig.FloatSetting(default, name)
+fun DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = DefaultAutoKonfig.DoubleSetting(default, name)
 fun BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.BooleanSetting(default, name)
 fun FlagSetting(name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.FlagSetting(name)
 
@@ -44,13 +50,25 @@ open class Group(name: String? = null) {
         names.joinToString(".")
     }
 
+    /**
+     * Settings using a specific AutoKonfig
+     */
     private fun AutoKonfig.StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = this.StringSettingProvider(default, name, this@Group)
     private fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = this.IntSettingProvider(default, name, this@Group)
+    private fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = this.LongSettingProvider(default, name, this@Group)
+    private fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = this.FloatSettingProvider(default, name, this@Group)
+    private fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = this.DoubleSettingProvider(default, name, this@Group)
     private fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = this.BooleanSettingProvider(default, name, this@Group)
     private fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, name)
 
+    /**
+     * Settings using the default AutoKonfig
+     */
     fun StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = DefaultAutoKonfig.StringSetting(default, name)
     fun IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = DefaultAutoKonfig.IntSetting(default, name)
+    fun LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = DefaultAutoKonfig.LongSetting(default, name)
+    fun FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = DefaultAutoKonfig.FloatSetting(default, name)
+    fun DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = DefaultAutoKonfig.DoubleSetting(default, name)
     fun BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.BooleanSetting(default, name)
     fun FlagSetting(name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.FlagSetting(name)
 }

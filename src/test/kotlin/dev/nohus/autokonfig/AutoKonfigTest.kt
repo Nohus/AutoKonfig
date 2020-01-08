@@ -211,14 +211,56 @@ class AutoKonfigTest {
         """
             string = hello
             int = 10
+            long = 3000000000
+            float = 3.14
+            double = 3.1415
             boolean = false
+            flag = true
         """.trimIndent().createConfigFile()
         val string by StringSetting()
         val int by IntSetting()
+        val long by LongSetting()
+        val float by FloatSetting()
+        val double by DoubleSetting()
         val boolean by BooleanSetting()
+        val flag by FlagSetting()
         assertEquals("hello", string)
         assertEquals(10, int)
+        assertEquals(3000000000, long)
+        assertEquals(3.14f, float)
+        assertEquals(3.1415, double)
         assertFalse(boolean)
+        assertTrue(flag)
+    }
+
+    object TypesGroup : Group() {
+        val string by StringSetting()
+        val int by IntSetting()
+        val long by LongSetting()
+        val float by FloatSetting()
+        val double by DoubleSetting()
+        val boolean by BooleanSetting()
+        val flag by FlagSetting()
+    }
+
+    @Test
+    fun `settings of all types can be read in a group`() {
+        """
+            typesGroup.string = hello
+            typesGroup.int = 10
+            typesGroup.long = 3000000000
+            typesGroup.float = 3.14
+            typesGroup.double = 3.1415
+            typesGroup.boolean = false
+            typesGroup.flag = true
+        """.trimIndent().createConfigFile()
+        assertEquals("hello", TypesGroup.string)
+        assertEquals(10, TypesGroup.int)
+        assertEquals(3000000000, TypesGroup.long)
+        assertEquals(3.14f, TypesGroup.float)
+        assertEquals(3.1415, TypesGroup.double)
+        assertFalse(TypesGroup.boolean)
+        assertTrue(TypesGroup.flag)
     }
 
     @Test
