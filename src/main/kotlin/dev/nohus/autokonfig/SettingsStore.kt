@@ -32,18 +32,25 @@ internal class SettingsStore {
             ?: keys.asSequence().map(::getValueIgnoringCase).firstOrNull { it != null }
     }
 
+    fun getAll(): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        map += properties.entries.map { it.key.toString() to it.value.toString() }.toMap()
+        map += flags.map { it to true.toString() }
+        return map
+    }
+
     private fun getKeyRepresentations(key: String): List<String> {
         return listOf(key, key.toSnakeCase(), key.toKebabCase())
     }
 
     private fun getValue(key: String): String? {
-        return properties.getProperty(key) ?: if (flags.contains(key)) "true" else null
+        return properties.getProperty(key) ?: if (flags.contains(key)) true.toString() else null
     }
 
     private fun getValueIgnoringCase(key: String): String? {
         val lowerKey = key.toLowerCase(Locale.US)
         return properties.entries.firstOrNull {
             it.key.toString().toLowerCase(Locale.US) == lowerKey
-        }?.value?.toString() ?: if (flags.any { it.toLowerCase(Locale.US) == lowerKey }) "true" else null
+        }?.value?.toString() ?: if (flags.any { it.toLowerCase(Locale.US) == lowerKey }) true.toString() else null
     }
 }

@@ -11,17 +11,19 @@ class AutoKonfig {
 
     private val settings = SettingsStore()
 
-    fun addProperty(key: String, value: String) {
+    internal fun addProperty(key: String, value: String) {
         settings.addProperty(key, value)
     }
 
-    fun addFlag(flag: String) {
+    internal fun addFlag(flag: String) {
         settings.addFlag(flag)
     }
 
     fun clear() = apply {
         settings.clear()
     }
+
+    fun getAll() = settings.getAll()
 
     private fun <T> getValue(key: String, transform: (String) -> T, default: T?): T {
         val value = settings.findValue(key)
@@ -86,6 +88,9 @@ class AutoKonfig {
     fun getFlag(key: String): Boolean = getBoolean(key, false)
 
     companion object {
+        fun clear() = DefaultAutoKonfig.clear()
+        fun getAll() = DefaultAutoKonfig.getAll()
+
         fun getString(key: String, default: String? = null): String = DefaultAutoKonfig.getString(key, default)
         fun getInt(key: String, default: Int? = null): Int = DefaultAutoKonfig.getInt(key, default)
         fun getLong(key: String, default: Long? = null): Long = DefaultAutoKonfig.getLong(key, default)

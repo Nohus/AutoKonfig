@@ -373,4 +373,17 @@ class AutoKonfigTest {
         }
         assertEquals("Failed to parse setting \"foo\", the value is: test", exception.message)
     }
+
+    @Test
+    fun `getAll returns all settings`() {
+        """
+            a = 1
+            b = 2
+        """.trimIndent().createConfigFile()
+        AutoKonfig.clear().withConfig(file)
+        assertEquals(mapOf(
+            "a" to "1",
+            "b" to "2"
+        ), AutoKonfig.getAll())
+    }
 }
