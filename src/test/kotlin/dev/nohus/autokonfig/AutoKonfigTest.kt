@@ -264,6 +264,26 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `settings of all types can be read directly`() {
+        """
+            string = hello
+            int = 10
+            long = 3000000000
+            float = 3.14
+            double = 3.1415
+            boolean = false
+            flag = true
+        """.trimIndent().createConfigFile()
+        assertEquals("hello", AutoKonfig.getString("string"))
+        assertEquals(10, AutoKonfig.getInt("int"))
+        assertEquals(3000000000, AutoKonfig.getLong("long"))
+        assertEquals(3.14f, AutoKonfig.getFloat("float"))
+        assertEquals(3.1415, AutoKonfig.getDouble("double"))
+        assertFalse(AutoKonfig.getBoolean("boolean"))
+        assertTrue(AutoKonfig.getFlag("flag"))
+    }
+
+    @Test
     fun `nonexistent setting throws an exception`() {
         "".createConfigFile()
         val exception = assertThrows<AutoKonfigException> {
