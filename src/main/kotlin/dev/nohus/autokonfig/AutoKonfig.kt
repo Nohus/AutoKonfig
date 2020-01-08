@@ -31,9 +31,7 @@ class AutoKonfig {
     ) {
 
         private fun checkExists(key: String) {
-            if (settings.findValue(key) == null) {
-                throw AutoKonfigException("Required key \"$key\" is missing")
-            } // TODO: Add where did it look
+            delegateProvider(key).getValue()
         }
 
         operator fun provideDelegate(thisRef: Any?, prop: KProperty<*>): ReadOnlyProperty<Any?, T> {
@@ -56,11 +54,19 @@ class AutoKonfig {
         private val default: T?
     ) : ReadOnlyProperty<Any?, T> {
 
-        override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        fun getValue(): T {
             val value = settings.findValue(key)
-            return if (value != null) transform(value)
-            else default ?: throw IllegalStateException("Missing setting property")
+            return if (value != null) {
+                try {
+                    transform(value)
+                } catch (e: Exception) {
+                    throw AutoKonfigException("Failed to parse setting \"foo\", the value is: test", e)
+                }
+            }
+            else default ?: throw AutoKonfigException("Required key \"$key\" is missing")
         }
+
+        override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = getValue()
     }
     internal inner class StringSettingDelegate(key: String, default: String?) : SettingDelegate<String>(key, ::mapString, default)
     internal inner class BooleanSettingDelegate(key: String, default: Boolean?) : SettingDelegate<Boolean>(key, ::mapBoolean, default)

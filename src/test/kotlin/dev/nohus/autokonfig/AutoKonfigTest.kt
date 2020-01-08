@@ -90,7 +90,7 @@ class AutoKonfigTest {
     }
 
     @Test
-    fun `keys are fuzzy matched`() {
+    fun `keys with different casing types are matched`() {
         """
             foo-bar = 5
             TEST_DATA = 4
@@ -301,8 +301,14 @@ class AutoKonfigTest {
         assertEquals("test", groupC.subgroup.setting)
     }
 
-//    @Test
-//    fun `wrong type of setting for value`() {
-//        assertTrue(false)
-//    }
+    @Test
+    fun `wrong type of setting for value throws an exception`() {
+        """
+            foo = test
+        """.trimIndent().createConfigFile()
+        val exception = assertThrows<AutoKonfigException> {
+            val a by IntSetting(name = "foo")
+        }
+        assertEquals("Failed to parse setting \"foo\", the value is: test", exception.message)
+    }
 }
