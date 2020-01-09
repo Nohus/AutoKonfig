@@ -50,14 +50,14 @@ fun AutoKonfig.withCommandLineArguments(args: Array<String>) = apply {
 
 fun AutoKonfig.withProperties(
     properties: Properties,
-    source: SettingSource = SettingSource("manually inserted properties")
+    source: SettingSource = SettingSource.reflective("properties")
 ) = apply {
     withMap(properties.map { it.key.toString() to it.value.toString() }.toMap(), source)
 }
 
 fun AutoKonfig.withMap(
     map: Map<String, String>,
-    source: SettingSource = SettingSource("manually inserted map")
+    source: SettingSource = SettingSource.reflective("a map")
 ) = apply {
     map.entries.forEach {
         addProperty(it.key, it.value, source)

@@ -440,12 +440,12 @@ class AutoKonfigTest {
     @Test
     fun `setting can be traced to manually inserted properties`() {
         AutoKonfig.clear().withProperties(Properties().apply { put("a", "b") })
-        assertEquals("Key \"a\" was read from manually inserted properties", AutoKonfig.getKeySource("a"))
+        assertTrue(AutoKonfig.getKeySource("a").startsWith("Key \"a\" was read from properties inserted by org.junit"))
     }
 
     @Test
     fun `setting can be traced to manually inserted map`() {
         AutoKonfig.clear().withMap(mapOf("a" to "b"))
-        assertEquals("Key \"a\" was read from manually inserted map", AutoKonfig.getKeySource("a"))
+        assertTrue(AutoKonfig.getKeySource("a").startsWith("Key \"a\" was read from a map inserted by org.junit"))
     }
 }
