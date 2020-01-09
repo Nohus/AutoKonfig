@@ -11,12 +11,16 @@ class AutoKonfig {
 
     private val settings = SettingsStore()
 
-    internal fun addProperty(key: String, value: String) {
-        settings.addProperty(key, value)
+    internal fun addProperty(key: String, value: String, source: SettingSource) {
+        settings.addProperty(key, value, source)
     }
 
-    internal fun addFlag(flag: String) {
-        settings.addFlag(flag)
+    internal fun addFlag(flag: String, source: SettingSource) {
+        settings.addFlag(flag, source)
+    }
+
+    fun getKeySource(key: String): String {
+        return settings.getSource(key)?.toString() ?: "Key \"$key\" not found"
     }
 
     fun clear() = apply {
@@ -90,6 +94,7 @@ class AutoKonfig {
     companion object {
         fun clear() = DefaultAutoKonfig.clear()
         fun getAll() = DefaultAutoKonfig.getAll()
+        fun getKeySource(key: String) = DefaultAutoKonfig.getKeySource(key)
 
         fun getString(key: String, default: String? = null): String = DefaultAutoKonfig.getString(key, default)
         fun getInt(key: String, default: Int? = null): Int = DefaultAutoKonfig.getInt(key, default)
