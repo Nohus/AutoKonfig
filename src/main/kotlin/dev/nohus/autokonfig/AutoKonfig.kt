@@ -1,5 +1,6 @@
 package dev.nohus.autokonfig
 
+import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -34,8 +35,8 @@ class AutoKonfig {
         return if (value != null) {
             try {
                 transform(value)
-            } catch (e: Exception) {
-                throw AutoKonfigException("Failed to parse setting \"foo\", the value is: test", e)
+            } catch (e: SettingParseException) {
+                throw AutoKonfigException("Failed to parse setting \"$key\", the value is \"$value\", but ${e.reason}")
             }
         }
         else default ?: throw AutoKonfigException("Required key \"$key\" is missing")
@@ -80,8 +81,14 @@ class AutoKonfig {
         : SettingProvider<Float>({ SettingDelegate(it, ::mapFloat, default) }, default != null, name, group)
     internal inner class DoubleSettingProvider(default: Double?, name: String?, group: Group?)
         : SettingProvider<Double>({ SettingDelegate(it, ::mapDouble, default) }, default != null, name, group)
+    internal inner class EnumSettingProvider<T : Enum<T>>(enum: Class<T>, default: T?, name: String?, group: Group?)
+        : SettingProvider<T>({ SettingDelegate(it, { mapEnum<T>(it, getEnumMapping(enum)) }, default) }, default != null, name, group)
     internal inner class BooleanSettingProvider(default: Boolean?, name: String?, group: Group?)
         : SettingProvider<Boolean>({ SettingDelegate(it, ::mapBoolean, default) }, default != null, name, group)
+
+    private fun <T: Enum<T>> getEnumMapping(enum: Class<T>): Map<String, T> {
+        return EnumSet.allOf(enum).map { it.name to it }.toMap()
+    }
 
     fun getString(key: String, default: String? = null): String = getValue(key, ::mapString, default)
     fun getInt(key: String, default: Int? = null): Int = getValue(key, ::mapInt, default)
@@ -105,10 +112,17 @@ class AutoKonfig {
         fun getFlag(key: String): Boolean = DefaultAutoKonfig.getFlag(key)
 
         private fun mapString(value: String) = value
-        private fun mapInt(value: String) = value.toInt()
-        private fun mapLong(value: String) = value.toLong()
-        private fun mapFloat(value: String) = value.toFloat()
-        private fun mapDouble(value: String) = value.toDouble()
+        private fun mapInt(value: String) = value.toIntOrNull() ?: throw SettingParseException("must be an Int number")
+        private fun mapLong(value: String) = value.toLongOrNull() ?: throw SettingParseException("must be a Long number")
+        private fun mapFloat(value: String) = value.toFloatOrNull() ?: throw SettingParseException("must be a Float number")
+        private fun mapDouble(value: String) = value.toDoubleOrNull() ?: throw SettingParseException("must be a Double number")
+        private fun <T> mapEnum(value: String, map: Map<String, T>): T {
+            return try {
+                map[value] ?: map.entries.first { it.key.toLowerCase(Locale.US) == value.toLowerCase(Locale.US) }.value
+            } catch (e: NoSuchElementException) {
+                throw SettingParseException("possible values are ${map.keys}")
+            }
+        }
         private fun mapBoolean(value: String) = value in listOf("true", "yes", "1")
     }
 }

@@ -372,7 +372,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             val a by IntSetting(name = "foo")
         }
-        assertEquals("Failed to parse setting \"foo\", the value is: test", exception.message)
+        assertEquals("Failed to parse setting \"foo\", the value is \"test\", but must be an Int number", exception.message)
     }
 
     @Test
@@ -447,5 +447,47 @@ class AutoKonfigTest {
     fun `setting can be traced to manually inserted map`() {
         AutoKonfig.clear().withMap(mapOf("a" to "b"))
         assertTrue(AutoKonfig.getKeySource("a").startsWith("Key \"a\" was read from a map inserted by org.junit"))
+    }
+
+    private enum class Letters {
+        Alpha, Beta
+    }
+
+    private object EnumGroup : Group() {
+        val setting by EnumSetting(Letters::class)
+        val settingJava by EnumSetting(Letters::class.java, name = "setting")
+    }
+
+    @Test
+    fun `enum settings can be read`() {
+        """
+            EnumGroup.setting = Alpha
+        """.trimIndent().createConfigFile()
+        assertEquals(Letters.Alpha, EnumGroup.setting)
+        assertEquals(Letters.Alpha, EnumGroup.settingJava)
+    }
+
+    @Test
+    fun `enum settings are case-insensitive`() {
+        """
+            EnumGroup.setting = beTA
+        """.trimIndent().createConfigFile()
+        assertEquals(Letters.Beta, EnumGroup.setting)
+        assertEquals(Letters.Beta, EnumGroup.settingJava)
+    }
+
+    @Test
+    fun `invalid enum value throws an exception`() {
+        """
+            setting = Gamma
+        """.trimIndent().createConfigFile()
+        val exception = assertThrows<AutoKonfigException> {
+            val setting by EnumSetting(Letters::class)
+        }
+        val exceptionJava = assertThrows<AutoKonfigException> {
+            val settingJava by EnumSetting(Letters::class.java, name = "setting")
+        }
+        assertEquals("Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]", exception.message)
+        assertEquals("Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]", exceptionJava.message)
     }
 }
