@@ -187,10 +187,12 @@ class AutoKonfigTest {
         """
             a = true
             b = yes
-            c = 1
-            d = false
-            e = no
-            f = 0
+            c = on
+            d = 1
+            e = false
+            f = no
+            g = off
+            h = 0
         """.trimIndent().createConfigFile()
         val a by BooleanSetting()
         val b by BooleanSetting()
@@ -198,12 +200,16 @@ class AutoKonfigTest {
         val d by BooleanSetting()
         val e by BooleanSetting()
         val f by BooleanSetting()
+        val g by BooleanSetting()
+        val h by BooleanSetting()
         assertTrue(a)
         assertTrue(b)
         assertTrue(c)
-        assertFalse(d)
+        assertTrue(d)
         assertFalse(e)
         assertFalse(f)
+        assertFalse(g)
+        assertFalse(h)
     }
 
     @Test
