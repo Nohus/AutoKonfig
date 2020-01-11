@@ -2,6 +2,8 @@ package dev.nohus.autokonfig
 
 import java.io.File
 import java.io.IOException
+import java.io.InputStreamReader
+import java.net.URL
 import java.util.*
 
 /**
@@ -18,10 +20,10 @@ fun AutoKonfig.withConfigs(files: List<File>) = apply {
 
 fun AutoKonfig.withConfig(file: File) = apply {
     try {
-        Properties().apply {
-            load(file.reader(Charsets.UTF_8))
-            withProperties(this, SettingSource("config file at \"${file.normalize().absolutePath}\""))
-        }
+        withConfigStream(
+            file.reader(Charsets.UTF_8),
+            SettingSource("config file at \"${file.normalize().absolutePath}\"")
+        )
     } catch (e: IOException) {
         throw AutoKonfigException("Failed to read file: ${file.normalize().absolutePath}")
     }
@@ -31,6 +33,19 @@ fun AutoKonfig.withResourceConfig(resource: String) = apply {
     val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(resource)
         ?: throw AutoKonfigException("Failed to read resource: $resource")
     withProperties(Properties().apply { load(stream) }, SettingSource("config file resource at \"$resource\""))
+}
+
+fun AutoKonfig.withURLConfig(url: URL) = apply {
+    withConfigStream(url.openStream().reader(), SettingSource("config file at URL: $url"))
+}
+
+fun AutoKonfig.withURLConfig(url: String) = withURLConfig(URL(url))
+
+private fun AutoKonfig.withConfigStream(config: InputStreamReader, source: SettingSource) = apply {
+    Properties().apply {
+        load(config)
+        withProperties(this, source)
+    }
 }
 
 fun AutoKonfig.withEnvironmentVariables() = apply {

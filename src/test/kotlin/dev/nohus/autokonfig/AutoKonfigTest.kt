@@ -164,6 +164,16 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `setting can be read from config file by URL`() {
+        """
+            setting = test
+        """.trimIndent().createConfigFile()
+        AutoKonfig.clear().withURLConfig(file.toURI().toString())
+        val setting by StringSetting()
+        assertEquals("test", setting)
+    }
+
+    @Test
     fun `setting can be read from command line arguments`() {
         val config = AutoKonfig().withCommandLineArguments(arrayOf("-a", "b", "-c"))
         val a by config.StringSetting()
