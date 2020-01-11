@@ -601,4 +601,71 @@ class AutoKonfigTest {
         }
         assertEquals("Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime", exception.message)
     }
+
+    object Collections : Group() {
+        val strings by ListSetting(StringSettingType)
+        val strings2 by ListSetting(StringSettingType, ",", name = "strings")
+        val strings3 by ListSetting(StringSettingType, Regex(","), name = "strings")
+        val numbers by SetSetting(IntSettingType)
+        val numbers2 by SetSetting(IntSettingType, ",", name = "numbers")
+        val numbers3 by SetSetting(IntSettingType, Regex(","), name = "numbers")
+    }
+
+    @Test
+    fun `list settings can be read in a group`() {
+        """
+            collections.strings = a,b,c
+            collections.numbers = 1,2,3,2,1
+        """.trimIndent().createConfigFile()
+        assertEquals(listOf("a", "b", "c"), Collections.strings)
+        assertEquals(listOf("a", "b", "c"), Collections.strings2)
+        assertEquals(listOf("a", "b", "c"), Collections.strings3)
+        assertEquals(setOf(1, 2, 3), Collections.numbers)
+        assertEquals(setOf(1, 2, 3), Collections.numbers2)
+        assertEquals(setOf(1, 2, 3), Collections.numbers3)
+    }
+
+    @Test
+    fun `list settings can be read`() {
+        """
+            strings = a,b,c
+            numbers = 1,2,3
+        """.trimIndent().createConfigFile()
+        val strings by ListSetting(StringSettingType)
+        val numbers by SetSetting(IntSettingType)
+        assertEquals(listOf("a", "b", "c"), strings)
+        assertEquals(setOf(1, 2, 3), numbers)
+    }
+
+    @Test
+    fun `list settings can be read directly`() {
+        """
+            strings = a,b,c
+            numbers = 1,2,3
+        """.trimIndent().createConfigFile()
+        assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
+        assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, ",", "strings"))
+        assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, Regex(","), "strings"))
+        assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
+        assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, ",", "numbers"))
+        assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, Regex(","),"numbers"))
+    }
+
+    @Test
+    fun `list settings with custom separators can be read`() {
+        """
+            commas = 1,2,3
+            commasAndWhitespace = 1,  2,      3
+            dots = 1.2.3
+            complex = 1AbC2teSt3
+        """.trimIndent().createConfigFile()
+        val commas by ListSetting(IntSettingType, ",")
+        val commasAndWhitespace by ListSetting(IntSettingType, Regex(",\\s+"))
+        val dots by SetSetting(IntSettingType, ".")
+        val complex by SetSetting(IntSettingType, Regex("[A-z]+"))
+        assertArrayEquals(listOf(1, 2, 3).toTypedArray(), commas.toTypedArray())
+        assertArrayEquals(listOf(1, 2, 3).toTypedArray(), commasAndWhitespace.toTypedArray())
+        assertArrayEquals(setOf(1, 2, 3).toTypedArray(), dots.toTypedArray())
+        assertArrayEquals(setOf(1, 2, 3).toTypedArray(), complex.toTypedArray())
+    }
 }
