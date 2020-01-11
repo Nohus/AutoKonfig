@@ -1,5 +1,7 @@
 package dev.nohus.autokonfig
 
+import dev.nohus.autokonfig.types.*
+import dev.nohus.autokonfig.utils.ConfigFileLocator
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

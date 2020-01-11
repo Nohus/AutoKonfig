@@ -1,4 +1,4 @@
-package dev.nohus.autokonfig
+package dev.nohus.autokonfig.utils
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 07/01/2020.

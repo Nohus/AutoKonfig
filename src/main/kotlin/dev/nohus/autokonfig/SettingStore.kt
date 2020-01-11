@@ -1,14 +1,14 @@
 package dev.nohus.autokonfig
 
-import dev.nohus.autokonfig.CaseUtils.toKebabCase
-import dev.nohus.autokonfig.CaseUtils.toSnakeCase
+import dev.nohus.autokonfig.utils.CaseUtils.toKebabCase
+import dev.nohus.autokonfig.utils.CaseUtils.toSnakeCase
 import java.util.*
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 07/01/2020.
  */
 
-internal class SettingsStore {
+internal class SettingStore {
 
     private val properties: Properties = Properties()
     private val flags = mutableSetOf<String>()

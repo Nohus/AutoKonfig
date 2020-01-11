@@ -1,7 +1,8 @@
 @file:Suppress("FunctionName")
 
-package dev.nohus.autokonfig
+package dev.nohus.autokonfig.types
 
+import dev.nohus.autokonfig.SettingParseException
 import java.time.*
 import java.time.format.DateTimeParseException
 import java.util.*

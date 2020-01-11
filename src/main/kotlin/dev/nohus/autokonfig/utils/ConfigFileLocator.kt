@@ -1,4 +1,4 @@
-package dev.nohus.autokonfig
+package dev.nohus.autokonfig.utils
 
 import java.io.File
 

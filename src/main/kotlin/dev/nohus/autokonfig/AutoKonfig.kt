@@ -1,5 +1,7 @@
 package dev.nohus.autokonfig
 
+import dev.nohus.autokonfig.types.Group
+import dev.nohus.autokonfig.types.SettingType
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -9,7 +11,7 @@ import kotlin.reflect.KProperty
 
 class AutoKonfig {
 
-    private val settings = SettingsStore()
+    private val settings = SettingStore()
 
     internal fun addProperty(key: String, value: String, source: SettingSource) {
         settings.addProperty(key, value, source)

@@ -1,5 +1,6 @@
 package dev.nohus.autokonfig
 
+import dev.nohus.autokonfig.utils.CommandLineParser
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

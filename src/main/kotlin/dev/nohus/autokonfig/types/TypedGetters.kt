@@ -1,5 +1,7 @@
-package dev.nohus.autokonfig
+package dev.nohus.autokonfig.types
 
+import dev.nohus.autokonfig.AutoKonfig
+import dev.nohus.autokonfig.DefaultAutoKonfig
 import java.time.*
 import kotlin.reflect.KClass
 
