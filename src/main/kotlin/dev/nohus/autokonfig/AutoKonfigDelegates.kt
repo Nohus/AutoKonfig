@@ -3,6 +3,7 @@
 package dev.nohus.autokonfig
 
 import dev.nohus.autokonfig.AutoKonfig.SettingProvider
+import java.time.*
 import kotlin.reflect.KClass
 
 /**
@@ -20,6 +21,11 @@ fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null): Set
 fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = this.BooleanSettingProvider(default, name, null)
 fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: Class<T>, default: T? = null, name: String? = null): SettingProvider<T> = this.EnumSettingProvider(enum, default, name, null)
 fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null): SettingProvider<T> = EnumSetting(enum.java, default, name)
+fun AutoKonfig.InstantSetting(default: Instant? = null, name: String? = null): SettingProvider<Instant> = this.InstantSettingProvider(default, name, null)
+fun AutoKonfig.DurationSetting(default: Duration? = null, name: String? = null): SettingProvider<Duration> = this.DurationSettingProvider(default, name, null)
+fun AutoKonfig.LocalTimeSetting(default: LocalTime? = null, name: String? = null): SettingProvider<LocalTime> = this.LocalTimeSettingProvider(default, name, null)
+fun AutoKonfig.LocalDateSetting(default: LocalDate? = null, name: String? = null): SettingProvider<LocalDate> = this.LocalDateSettingProvider(default, name, null)
+fun AutoKonfig.LocalDateTimeSetting(default: LocalDateTime? = null, name: String? = null): SettingProvider<LocalDateTime> = this.LocalDateTimeSettingProvider(default, name, null)
 fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, name)
 
 /**
@@ -33,6 +39,11 @@ fun DoubleSetting(default: Double? = null, name: String? = null): SettingProvide
 fun BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.BooleanSetting(default, name)
 fun <T : Enum<T>> EnumSetting(enum: Class<T>, default: T? = null, name: String? = null): SettingProvider<T> = DefaultAutoKonfig.EnumSetting(enum, default, name)
 fun <T : Enum<T>> EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null): SettingProvider<T> = DefaultAutoKonfig.EnumSetting(enum, default, name)
+fun InstantSetting(default: Instant? = null, name: String? = null): SettingProvider<Instant> = DefaultAutoKonfig.InstantSetting(default, name)
+fun DurationSetting(default: Duration? = null, name: String? = null): SettingProvider<Duration> = DefaultAutoKonfig.DurationSetting(default, name)
+fun LocalTimeSetting(default: LocalTime? = null, name: String? = null): SettingProvider<LocalTime> = DefaultAutoKonfig.LocalTimeSetting(default, name)
+fun LocalDateSetting(default: LocalDate? = null, name: String? = null): SettingProvider<LocalDate> = DefaultAutoKonfig.LocalDateSetting(default, name)
+fun LocalDateTimeSetting(default: LocalDateTime? = null, name: String? = null): SettingProvider<LocalDateTime> = DefaultAutoKonfig.LocalDateTimeSetting(default, name)
 fun FlagSetting(name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.FlagSetting(name)
 
 /**
@@ -58,15 +69,20 @@ open class Group(name: String? = null) {
     /**
      * Settings using a specific AutoKonfig
      */
-    private fun AutoKonfig.StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = this.StringSettingProvider(default, name, this@Group)
-    private fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = this.IntSettingProvider(default, name, this@Group)
-    private fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = this.LongSettingProvider(default, name, this@Group)
-    private fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = this.FloatSettingProvider(default, name, this@Group)
-    private fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = this.DoubleSettingProvider(default, name, this@Group)
-    private fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = this.BooleanSettingProvider(default, name, this@Group)
+    fun AutoKonfig.StringSetting(default: String? = null, name: String? = null): SettingProvider<String> = this.StringSettingProvider(default, name, this@Group)
+    fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null): SettingProvider<Int> = this.IntSettingProvider(default, name, this@Group)
+    fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null): SettingProvider<Long> = this.LongSettingProvider(default, name, this@Group)
+    fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null): SettingProvider<Float> = this.FloatSettingProvider(default, name, this@Group)
+    fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null): SettingProvider<Double> = this.DoubleSettingProvider(default, name, this@Group)
+    fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = this.BooleanSettingProvider(default, name, this@Group)
     fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: Class<T>, default: T? = null, name: String? = null): SettingProvider<T> = this.EnumSettingProvider(enum, default, name, this@Group)
     fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null): SettingProvider<T> = EnumSetting(enum.java, default, name)
-    private fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, name)
+    fun AutoKonfig.InstantSetting(default: Instant? = null, name: String? = null): SettingProvider<Instant> = this.InstantSettingProvider(default, name, this@Group)
+    fun AutoKonfig.DurationSetting(default: Duration? = null, name: String? = null): SettingProvider<Duration> = this.DurationSettingProvider(default, name, this@Group)
+    fun AutoKonfig.LocalTimeSetting(default: LocalTime? = null, name: String? = null): SettingProvider<LocalTime> = this.LocalTimeSettingProvider(default, name, this@Group)
+    fun AutoKonfig.LocalDateSetting(default: LocalDate? = null, name: String? = null): SettingProvider<LocalDate> = this.LocalDateSettingProvider(default, name, this@Group)
+    fun AutoKonfig.LocalDateTimeSetting(default: LocalDateTime? = null, name: String? = null): SettingProvider<LocalDateTime> = this.LocalDateTimeSettingProvider(default, name, this@Group)
+    fun AutoKonfig.FlagSetting(name: String? = null) = this.BooleanSetting(false, name)
 
     /**
      * Settings using the default AutoKonfig
@@ -79,5 +95,10 @@ open class Group(name: String? = null) {
     fun BooleanSetting(default: Boolean? = null, name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.BooleanSetting(default, name)
     fun <T : Enum<T>> EnumSetting(enum: Class<T>, default: T? = null, name: String? = null): SettingProvider<T> = DefaultAutoKonfig.EnumSetting(enum, default, name)
     fun <T : Enum<T>> EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null): SettingProvider<T> = DefaultAutoKonfig.EnumSetting(enum, default, name)
+    fun InstantSetting(default: Instant? = null, name: String? = null): SettingProvider<Instant> = DefaultAutoKonfig.InstantSetting(default, name)
+    fun DurationSetting(default: Duration? = null, name: String? = null): SettingProvider<Duration> = DefaultAutoKonfig.DurationSetting(default, name)
+    fun LocalTimeSetting(default: LocalTime? = null, name: String? = null): SettingProvider<LocalTime> = DefaultAutoKonfig.LocalTimeSetting(default, name)
+    fun LocalDateSetting(default: LocalDate? = null, name: String? = null): SettingProvider<LocalDate> = DefaultAutoKonfig.LocalDateSetting(default, name)
+    fun LocalDateTimeSetting(default: LocalDateTime? = null, name: String? = null): SettingProvider<LocalDateTime> = DefaultAutoKonfig.LocalDateTimeSetting(default, name)
     fun FlagSetting(name: String? = null): SettingProvider<Boolean> = DefaultAutoKonfig.FlagSetting(name)
 }

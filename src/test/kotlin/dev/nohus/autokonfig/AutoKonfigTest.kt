@@ -468,6 +468,15 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `enum settings can be read directly`() {
+        """
+            setting = Alpha
+        """.trimIndent().createConfigFile()
+        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
+        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
+    }
+
+    @Test
     fun `enum settings are case-insensitive`() {
         """
             EnumGroup.setting = beTA
@@ -489,5 +498,97 @@ class AutoKonfigTest {
         }
         assertEquals("Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]", exception.message)
         assertEquals("Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]", exceptionJava.message)
+    }
+
+    private object Temporal : Group() {
+        val instant by InstantSetting()
+        val duration by DurationSetting()
+        val localTime by LocalTimeSetting()
+        val localDate by LocalDateSetting()
+        val localDateTime by LocalDateTimeSetting()
+    }
+
+    @Test
+    fun `temporal settings can be read in a group`() {
+        """
+            temporal.instant = 2011-12-03T10:15:30Z
+            temporal.duration = PT20.345S
+            temporal.local-time = 10:15:30
+            temporal.local-date = 2020-01-09
+            temporal.local-date-time = 2020-01-09T10:15:30
+        """.trimIndent().createConfigFile()
+        assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
+        assertEquals("PT20.345S", Temporal.duration.toString())
+        assertEquals("10:15:30", Temporal.localTime.toString())
+        assertEquals("2020-01-09", Temporal.localDate.toString())
+        assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
+    }
+
+    @Test
+    fun `temporal settings can be read`() {
+        """
+            instant = 2011-12-03T10:15:30Z
+            duration = PT20.345S
+            local-time = 10:15:30
+            local-date = 2020-01-09
+            local-date-time = 2020-01-09T10:15:30
+        """.trimIndent().createConfigFile()
+        val instant by InstantSetting()
+        val duration by DurationSetting()
+        val localTime by LocalTimeSetting()
+        val localDate by LocalDateSetting()
+        val localDateTime by LocalDateTimeSetting()
+        assertEquals("2011-12-03T10:15:30Z", instant.toString())
+        assertEquals("PT20.345S", duration.toString())
+        assertEquals("10:15:30", localTime.toString())
+        assertEquals("2020-01-09", localDate.toString())
+        assertEquals("2020-01-09T10:15:30", localDateTime.toString())
+    }
+
+    @Test
+    fun `temporal settings can be read directly`() {
+        """
+            instant = 2011-12-03T10:15:30Z
+            duration = PT20.345S
+            local-time = 10:15:30
+            local-date = 2020-01-09
+            local-date-time = 2020-01-09T10:15:30
+        """.trimIndent().createConfigFile()
+        assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
+        assertEquals("PT20.345S", AutoKonfig.getDuration("duration").toString())
+        assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
+        assertEquals("2020-01-09", AutoKonfig.getLocalDate("local-date").toString())
+        assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
+    }
+
+    @Test
+    fun `invalid temporal values throw exceptions`() {
+        """
+            instant = invalid
+            duration = invalid
+            local-time = invalid
+            local-date = invalid
+            local-date-time = invalid
+        """.trimIndent().createConfigFile()
+        var exception: AutoKonfigException = assertThrows {
+            val instant by InstantSetting()
+        }
+        assertEquals("Failed to parse setting \"instant\", the value is \"invalid\", but must be an Instant", exception.message)
+        exception = assertThrows {
+            val duration by DurationSetting()
+        }
+        assertEquals("Failed to parse setting \"duration\", the value is \"invalid\", but must be a Duration", exception.message)
+        exception = assertThrows {
+            val localTime by LocalTimeSetting()
+        }
+        assertEquals("Failed to parse setting \"localTime\", the value is \"invalid\", but must be a LocalTime", exception.message)
+        exception = assertThrows {
+            val localDate by LocalDateSetting()
+        }
+        assertEquals("Failed to parse setting \"localDate\", the value is \"invalid\", but must be a LocalDate", exception.message)
+        exception = assertThrows {
+            val localDateTime by LocalDateTimeSetting()
+        }
+        assertEquals("Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime", exception.message)
     }
 }
