@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
+import java.time.Duration
 import java.util.*
 import kotlin.reflect.jvm.isAccessible
 
@@ -548,13 +549,13 @@ class AutoKonfigTest {
     fun `temporal settings can be read in a group`() {
         """
             temporal.instant = 2011-12-03T10:15:30Z
-            temporal.duration = PT20.345S
+            temporal.duration = 10s
             temporal.local-time = 10:15:30
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
         assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
-        assertEquals("PT20.345S", Temporal.duration.toString())
+        assertEquals(Duration.ofSeconds(10), Temporal.duration)
         assertEquals("10:15:30", Temporal.localTime.toString())
         assertEquals("2020-01-09", Temporal.localDate.toString())
         assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
@@ -564,7 +565,7 @@ class AutoKonfigTest {
     fun `temporal settings can be read`() {
         """
             instant = 2011-12-03T10:15:30Z
-            duration = PT20.345S
+            duration = 10s
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
@@ -575,7 +576,7 @@ class AutoKonfigTest {
         val localDate by LocalDateSetting()
         val localDateTime by LocalDateTimeSetting()
         assertEquals("2011-12-03T10:15:30Z", instant.toString())
-        assertEquals("PT20.345S", duration.toString())
+        assertEquals(Duration.ofSeconds(10), duration)
         assertEquals("10:15:30", localTime.toString())
         assertEquals("2020-01-09", localDate.toString())
         assertEquals("2020-01-09T10:15:30", localDateTime.toString())
@@ -585,13 +586,13 @@ class AutoKonfigTest {
     fun `temporal settings can be read directly`() {
         """
             instant = 2011-12-03T10:15:30Z
-            duration = PT20.345S
+            duration = 10s
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
         assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
-        assertEquals("PT20.345S", AutoKonfig.getDuration("duration").toString())
+        assertEquals(Duration.ofSeconds(10), AutoKonfig.getDuration("duration"))
         assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
         assertEquals("2020-01-09", AutoKonfig.getLocalDate("local-date").toString())
         assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
@@ -613,7 +614,7 @@ class AutoKonfigTest {
         exception = assertThrows {
             val duration by DurationSetting()
         }
-        assertEquals("Failed to parse setting \"duration\", the value is \"invalid\", but must be a Duration", exception.message)
+        assertEquals("Failed to parse setting \"duration\", the value is \"invalid\", but it is missing a number", exception.message)
         exception = assertThrows {
             val localTime by LocalTimeSetting()
         }
@@ -626,6 +627,58 @@ class AutoKonfigTest {
             val localDateTime by LocalDateTimeSetting()
         }
         assertEquals("Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime", exception.message)
+    }
+
+    @Test
+    fun `natural duration settings can be read`() {
+        """
+            plain = 10
+            unit = 20s
+            space = 25 s
+            whitespace = 30    s
+            nanos = 50ns
+            long = 100000 days
+            fraction = 0.5 day
+        """.trimIndent().useAsHocon()
+        assertEquals(Duration.ofMillis(10), AutoKonfig.getDuration("plain"))
+        assertEquals(Duration.ofSeconds(20), AutoKonfig.getDuration("unit"))
+        assertEquals(Duration.ofSeconds(25), AutoKonfig.getDuration("space"))
+        assertEquals(Duration.ofSeconds(30), AutoKonfig.getDuration("whitespace"))
+        assertEquals(Duration.ofNanos(50), AutoKonfig.getDuration("nanos"))
+        assertEquals(Duration.ofDays(100000), AutoKonfig.getDuration("long"))
+        assertEquals(Duration.ofHours(12), AutoKonfig.getDuration("fraction"))
+    }
+
+    @Test
+    fun `invalid natural duration values throw exceptions`() {
+        """
+            missing = 
+            onlyUnit = days
+            invalidUnit = 5 whiles
+            invalidNumber = 5.5.5 seconds
+            unitFirst = seconds 10
+        """.trimIndent().useAsProperties()
+        var exception: AutoKonfigException = assertThrows {
+            AutoKonfig.getDuration("missing")
+        }
+        assertEquals("Failed to parse setting \"missing\", the value is \"\", but it is missing a number", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getDuration("onlyUnit")
+        }
+        assertEquals("Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getDuration("invalidUnit")
+        }
+        assertEquals("Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the time unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getDuration("invalidNumber")
+        }
+        assertEquals("Failed to parse setting \"invalidNumber\", the value is \"5.5.5 seconds\", but \"5.5.5\" is not a number", exception.message)
+
+        exception = assertThrows {
+            AutoKonfig.getDuration("unitFirst")
+        }
+        assertEquals("Failed to parse setting \"unitFirst\", the value is \"seconds 10\", but it is missing a number", exception.message)
     }
 
     object Collections : Group() {

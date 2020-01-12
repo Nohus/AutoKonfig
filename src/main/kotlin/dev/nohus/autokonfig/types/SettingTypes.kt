@@ -6,6 +6,7 @@ import dev.nohus.autokonfig.SettingParseException
 import java.time.*
 import java.time.format.DateTimeParseException
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 11/01/2020.
@@ -46,7 +47,30 @@ private fun <T : Enum<T>> mapEnum(value: String, enum: Class<T>): T {
     }
 }
 private fun mapInstant(value: String) = try { Instant.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be an Instant", e) }
-private fun mapDuration(value: String) = try { Duration.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a Duration", e) }
+private val durationUnits = mapOf(
+    listOf("", "ms", "millis", "milliseconds") to TimeUnit.MILLISECONDS,
+    listOf("us", "micros", "microseconds") to TimeUnit.MICROSECONDS,
+    listOf("ns", "nanos", "nanoseconds") to TimeUnit.NANOSECONDS,
+    listOf("s", "second", "seconds") to TimeUnit.SECONDS,
+    listOf("m", "minute", "minutes") to TimeUnit.MINUTES,
+    listOf("h", "hour", "hours") to TimeUnit.HOURS,
+    listOf("d", "day", "days") to TimeUnit.DAYS
+)
+private fun mapDuration(value: String): Duration {
+    val unitIndex = value.indexOfFirst { it.isLetter() }
+    val unitString = if (unitIndex > -1) value.substring(unitIndex) else ""
+    val numberString = (if (unitIndex > -1) value.substringBefore(unitString) else value).trim()
+    if (numberString.isEmpty()) throw SettingParseException("it is missing a number")
+
+    val unit = durationUnits.entries.firstOrNull { unitString in it.key }?.value
+        ?: throw SettingParseException("the time unit \"$unitString\" must be one of ${durationUnits.keys.flatten().map { "\"$it\"" }}")
+
+    val nanos = unit.toNanos(1)
+    val duration = numberString.toLongOrNull()?.let { nanos * it }
+        ?: numberString.toDoubleOrNull()?.let { (nanos * it).toLong() }
+        ?: throw SettingParseException("\"$numberString\" is not a number")
+    return Duration.ofNanos(duration)
+}
 private fun mapLocalTime(value: String) = try { LocalTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalTime", e) }
 private fun mapLocalDate(value: String) = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
 private fun mapLocalDateTime(value: String) = try { LocalDateTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDateTime", e) }
