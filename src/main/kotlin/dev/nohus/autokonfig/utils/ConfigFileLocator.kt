@@ -9,7 +9,7 @@ import java.io.File
 class ConfigFileLocator(private val basePath: String = ".") {
 
     companion object {
-        private val VALID_EXTENSIONS = listOf("properties", "conf", "config", "ini", "txt")
+        private val VALID_EXTENSIONS = listOf("conf", "json", "properties", "config", "ini", "txt")
     }
 
     fun getConfigFiles(): List<File> {

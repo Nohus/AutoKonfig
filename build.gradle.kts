@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect", "1.3.61"))
+    implementation("com.typesafe:config:1.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
 }
 

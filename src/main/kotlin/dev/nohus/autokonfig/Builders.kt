@@ -1,10 +1,11 @@
 package dev.nohus.autokonfig
 
+import com.typesafe.config.*
+import com.typesafe.config.ConfigValueType.LIST
 import dev.nohus.autokonfig.utils.CommandLineParser
 import dev.nohus.autokonfig.utils.SourceUtil
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
+import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
 
@@ -17,37 +18,57 @@ fun AutoKonfig.withConfigs(vararg files: File) = apply {
 }
 
 fun AutoKonfig.withConfigs(files: List<File>) = apply {
-    files.forEach { withConfig(it) }
+    files.reversed().forEach { withConfig(it) }
 }
 
 fun AutoKonfig.withConfig(file: File) = apply {
     try {
-        withConfigStream(
-            file.reader(Charsets.UTF_8),
-            "config file at \"${file.normalize().absolutePath}\""
-        )
-    } catch (e: IOException) {
-        throw AutoKonfigException("Failed to read file: ${file.normalize().absolutePath}")
+        val config = ConfigFactory.parseFile(file, ConfigParseOptions.defaults().setAllowMissing(false))
+        withConfig(config, "config file at \"${file.normalize().absolutePath}\"")
+    } catch (e: ConfigException) {
+        throw AutoKonfigException("Failed to read file: ${file.normalize().absolutePath}", e)
     }
 }
 
 fun AutoKonfig.withResourceConfig(resource: String) = apply {
-    val stream = ClassLoader.getSystemClassLoader().getResourceAsStream(resource)
-        ?: throw AutoKonfigException("Failed to read resource: $resource")
-    withConfigStream(stream.reader(), "config file resource at \"$resource\"")
+    try {
+        val config = ConfigFactory.parseResources(resource, ConfigParseOptions.defaults().setAllowMissing(false))
+        withConfig(config, "config file resource at \"$resource\"")
+    } catch (e: ConfigException) {
+        throw AutoKonfigException("Failed to read resource: $resource", e)
+    }
 }
 
 fun AutoKonfig.withURLConfig(url: URL) = apply {
-    withConfigStream(url.openStream().reader(), "config file at URL: $url")
+    try {
+        val config = ConfigFactory.parseURL(url, ConfigParseOptions.defaults().setAllowMissing(false))
+        withConfig(config, "config file at URL: $url")
+    } catch (e: ConfigException) {
+        throw AutoKonfigException("Failed to read URL: $url", e)
+    }
 }
 
-fun AutoKonfig.withURLConfig(url: String) = withURLConfig(URL(url))
-
-private fun AutoKonfig.withConfigStream(config: InputStreamReader, source: String) = apply {
-    Properties().apply {
-        load(config)
-        withProperties(this, source)
+fun AutoKonfig.withURLConfig(url: String) {
+    try {
+        withURLConfig(URL(url))
+    } catch (e: MalformedURLException) {
+        throw AutoKonfigException("Failed to read malformed URL: $url", e)
     }
+}
+
+private fun AutoKonfig.withConfig(config: Config, source: String) = apply {
+    val resolved = config.resolve(ConfigResolveOptions.noSystem())
+    resolved.entrySet()
+        .map {
+            val string = when (resolved.getValue(it.key).valueType()) {
+                LIST -> resolved.getStringList(it.key).joinToString(",")
+                else -> resolved.getString(it.key)
+            }
+            it.key to string
+        }
+        .forEach { (key, value) ->
+            addProperty(key, value, source)
+        }
 }
 
 fun AutoKonfig.withEnvironmentVariables() = apply {

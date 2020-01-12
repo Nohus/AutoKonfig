@@ -16,16 +16,17 @@ import kotlin.reflect.jvm.isAccessible
 
 class AutoKonfigTest {
 
-    private val file = File("test.conf")
+    private val file = File("test.properties")
+    private val hoconFile = File("test.conf")
 
-    private fun String.createConfigFile() {
+    private fun String.useAsProperties() {
         file.writeText(this)
         resetDefaultAutoKonfig()
     }
 
-    private fun String.createAutoKonfig(): AutoKonfig {
-        createConfigFile()
-        return AutoKonfig().withConfig(file)
+    private fun String.useAsHocon() {
+        hoconFile.writeText(this)
+        resetDefaultAutoKonfig()
     }
 
     private fun resetDefaultAutoKonfig() {
@@ -39,24 +40,25 @@ class AutoKonfigTest {
     @AfterEach
     fun tearDown() {
         file.delete()
+        hoconFile.delete()
     }
 
     @Test
     fun `setting can be read`() {
-        val config = "setting = test".createAutoKonfig()
-        val setting by config.StringSetting()
+        "setting = test".useAsProperties()
+        val setting by DefaultAutoKonfig.StringSetting()
         assertEquals("test", setting)
     }
 
     @Test
     fun `multiple settings can be read`() {
-        val config = """
+        """
             foo = abc
             bar = def
             baz = ghi
-        """.trimIndent().createAutoKonfig()
-        val foo by config.StringSetting()
-        val baz by config.StringSetting()
+        """.trimIndent().useAsProperties()
+        val foo by DefaultAutoKonfig.StringSetting()
+        val baz by DefaultAutoKonfig.StringSetting()
         assertEquals("abc", foo)
         assertEquals("ghi", baz)
     }
@@ -67,7 +69,7 @@ class AutoKonfigTest {
             foo = abc
             bar = def
             baz = ghi
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val foo by StringSetting()
         val baz by StringSetting()
         assertEquals("abc", foo)
@@ -79,7 +81,7 @@ class AutoKonfigTest {
         """
             FOO = abc
             bar = DEF
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val foo by StringSetting()
         val bar by StringSetting()
         val a by StringSetting(name = "foo")
@@ -97,7 +99,7 @@ class AutoKonfigTest {
         """
             foo-bar = 5
             TEST_DATA = 4
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val a by IntSetting(name = "foo-bar")
         val fooBar by IntSetting()
         val b by IntSetting(name = "TEST_DATA")
@@ -114,7 +116,7 @@ class AutoKonfigTest {
     fun `keys can have custom names`() {
         """
             foo = abc
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val bar by StringSetting(name = "foo")
         assertEquals("abc", bar)
     }
@@ -123,7 +125,7 @@ class AutoKonfigTest {
     fun `multiple variables be delegated to the same setting`() {
         """
             foo = abc
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val foo by StringSetting()
         val bar by StringSetting(name = "foo")
         assertEquals("abc", foo)
@@ -169,7 +171,7 @@ class AutoKonfigTest {
     fun `setting can be read from config file by URL`() {
         """
             setting = test
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         AutoKonfig.clear().withURLConfig(file.toURI().toString())
         val setting by StringSetting()
         assertEquals("test", setting)
@@ -195,7 +197,7 @@ class AutoKonfigTest {
             f = no
             g = off
             h = 0
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val a by BooleanSetting()
         val b by BooleanSetting()
         val c by BooleanSetting()
@@ -218,7 +220,7 @@ class AutoKonfigTest {
     fun `flag settings are false by default`() {
         """
             a = true
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val a by FlagSetting()
         val b by FlagSetting()
         assertTrue(a)
@@ -235,7 +237,7 @@ class AutoKonfigTest {
             double = 3.1415
             boolean = false
             flag = true
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val string by StringSetting()
         val int by IntSetting()
         val long by LongSetting()
@@ -272,7 +274,7 @@ class AutoKonfigTest {
             typesGroup.double = 3.1415
             typesGroup.boolean = false
             typesGroup.flag = true
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("hello", TypesGroup.string)
         assertEquals(10, TypesGroup.int)
         assertEquals(3000000000, TypesGroup.long)
@@ -292,7 +294,7 @@ class AutoKonfigTest {
             double = 3.1415
             boolean = false
             flag = true
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("hello", AutoKonfig.getString("string"))
         assertEquals(10, AutoKonfig.getInt("int"))
         assertEquals(3000000000, AutoKonfig.getLong("long"))
@@ -304,7 +306,7 @@ class AutoKonfigTest {
 
     @Test
     fun `nonexistent setting throws an exception`() {
-        "".createConfigFile()
+        "".useAsProperties()
         val exception = assertThrows<AutoKonfigException> {
             val nonexistent by StringSetting()
         }
@@ -329,6 +331,22 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `malformed URL config file throws an exception`() {
+        val exception = assertThrows<AutoKonfigException> {
+            AutoKonfig().withURLConfig("fake://URL")
+        }
+        assertEquals("Failed to read malformed URL: fake://URL", exception.message)
+    }
+
+    @Test
+    fun `nonexistent URL config file throws an exception`() {
+        val exception = assertThrows<AutoKonfigException> {
+            AutoKonfig().withURLConfig("file://nonexistent")
+        }
+        assertEquals("Failed to read URL: file://nonexistent", exception.message)
+    }
+
+    @Test
     fun `settings can be read from multiple files`() {
         val config = AutoKonfig().withConfigs(
             File("src/test/resources/test/multiple/5.properties"),
@@ -350,7 +368,7 @@ class AutoKonfigTest {
     fun `setting can be read in a group`() {
         """
             groupA.subgroup.setting = test
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("test", groupA.subgroup.setting)
     }
 
@@ -364,7 +382,7 @@ class AutoKonfigTest {
     fun `setting can be read in a group with custom names`() {
         """
             outer.inner.key = test
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("test", groupB.subgroup.setting)
     }
 
@@ -378,7 +396,7 @@ class AutoKonfigTest {
     fun `setting can be read in a group with some custom names`() {
         """
             outer.subgroup.setting = test
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("test", groupC.subgroup.setting)
     }
 
@@ -386,7 +404,7 @@ class AutoKonfigTest {
     fun `wrong type of setting for value throws an exception`() {
         """
             foo = test
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val exception = assertThrows<AutoKonfigException> {
             val a by IntSetting(name = "foo")
         }
@@ -398,7 +416,7 @@ class AutoKonfigTest {
         """
             a = 1
             b = 2
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
         assertEquals(mapOf(
             "a" to "1",
@@ -410,7 +428,7 @@ class AutoKonfigTest {
     fun `setting can be traced to a file`() {
         """
             foo = 2
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
         assertEquals("Key \"foo\" was read from config file at \"${file.normalize().absolutePath}\"", AutoKonfig.getKeySource("foo"))
     }
@@ -419,7 +437,7 @@ class AutoKonfigTest {
     fun `setting with a fuzzy matched key can be traced to a file`() {
         """
             SERVER_PORT = 2
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
         assertEquals("Key \"serverPort\" was read as \"SERVER_PORT\" from config file at \"${file.normalize().absolutePath}\"",
             AutoKonfig.getKeySource("serverPort"))
@@ -480,7 +498,7 @@ class AutoKonfigTest {
     fun `enum settings can be read`() {
         """
             EnumGroup.setting = Alpha
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals(Letters.Alpha, EnumGroup.setting)
         assertEquals(Letters.Alpha, EnumGroup.settingJava)
     }
@@ -489,7 +507,7 @@ class AutoKonfigTest {
     fun `enum settings can be read directly`() {
         """
             setting = Alpha
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
         assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
     }
@@ -498,7 +516,7 @@ class AutoKonfigTest {
     fun `enum settings are case-insensitive`() {
         """
             EnumGroup.setting = beTA
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals(Letters.Beta, EnumGroup.setting)
         assertEquals(Letters.Beta, EnumGroup.settingJava)
     }
@@ -507,7 +525,7 @@ class AutoKonfigTest {
     fun `invalid enum value throws an exception`() {
         """
             setting = Gamma
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val exception = assertThrows<AutoKonfigException> {
             val setting by EnumSetting(Letters::class)
         }
@@ -534,7 +552,7 @@ class AutoKonfigTest {
             temporal.local-time = 10:15:30
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
         assertEquals("PT20.345S", Temporal.duration.toString())
         assertEquals("10:15:30", Temporal.localTime.toString())
@@ -550,7 +568,7 @@ class AutoKonfigTest {
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val instant by InstantSetting()
         val duration by DurationSetting()
         val localTime by LocalTimeSetting()
@@ -571,7 +589,7 @@ class AutoKonfigTest {
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
         assertEquals("PT20.345S", AutoKonfig.getDuration("duration").toString())
         assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
@@ -587,7 +605,7 @@ class AutoKonfigTest {
             local-time = invalid
             local-date = invalid
             local-date-time = invalid
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         var exception: AutoKonfigException = assertThrows {
             val instant by InstantSetting()
         }
@@ -624,7 +642,7 @@ class AutoKonfigTest {
         """
             collections.strings = a,b,c
             collections.numbers = 1,2,3,2,1
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals(listOf("a", "b", "c"), Collections.strings)
         assertEquals(listOf("a", "b", "c"), Collections.strings2)
         assertEquals(listOf("a", "b", "c"), Collections.strings3)
@@ -638,7 +656,7 @@ class AutoKonfigTest {
         """
             strings = a,b,c
             numbers = 1,2,3
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val strings by ListSetting(StringSettingType)
         val numbers by SetSetting(IntSettingType)
         assertEquals(listOf("a", "b", "c"), strings)
@@ -650,7 +668,7 @@ class AutoKonfigTest {
         """
             strings = a,b,c
             numbers = 1,2,3
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
         assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, ",", "strings"))
         assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, Regex(","), "strings"))
@@ -666,7 +684,7 @@ class AutoKonfigTest {
             commasAndWhitespace = 1,  2,      3
             dots = 1.2.3
             complex = 1AbC2teSt3
-        """.trimIndent().createConfigFile()
+        """.trimIndent().useAsProperties()
         val commas by ListSetting(IntSettingType, ",")
         val commasAndWhitespace by ListSetting(IntSettingType, Regex(",\\s+"))
         val dots by SetSetting(IntSettingType, ".")
@@ -675,5 +693,62 @@ class AutoKonfigTest {
         assertArrayEquals(listOf(1, 2, 3).toTypedArray(), commasAndWhitespace.toTypedArray())
         assertArrayEquals(setOf(1, 2, 3).toTypedArray(), dots.toTypedArray())
         assertArrayEquals(setOf(1, 2, 3).toTypedArray(), complex.toTypedArray())
+    }
+
+    @Test
+    fun `parses json`() {
+        """
+            {
+                "foo" : {
+                    "bar" : 10,
+                    "baz" : 12
+                }
+            }
+        """.trimIndent().useAsHocon()
+        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+    }
+
+    @Test
+    fun `parses hocon`() {
+        """
+            foo {
+                bar = 10
+                baz = 12
+            }
+        """.trimIndent().useAsHocon()
+        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+    }
+
+    @Test
+    fun `parses hocon single line`() {
+        """
+            foo.bar=10, foo.baz=12
+        """.trimIndent().useAsHocon()
+        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+    }
+
+    @Test
+    fun `parses hocon with substitutions`() {
+        """
+            foo = 15
+            bar = ${'$'}{foo}
+        """.trimIndent().useAsHocon()
+        assertEquals(15, AutoKonfig.getInt("bar"))
+    }
+
+    @Test
+    fun `parses hocon with unquoted strings`() {
+        """
+            foo : 20 10 10
+        """.trimIndent().useAsHocon()
+        assertEquals(setOf(20, 10), AutoKonfig.getSet(IntSettingType, " ", "foo"))
+    }
+
+    @Test
+    fun `parses hocon with arrays`() {
+        """
+            foo = [1,2,3]
+        """.trimIndent().useAsHocon()
+        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "foo"))
     }
 }
