@@ -37,7 +37,7 @@ class AutoKonfig {
             try {
                 type.transform(value)
             } catch (e: SettingParseException) {
-                throw AutoKonfigException("Failed to parse setting \"$key\", the value is \"$value\", but ${e.reason}", e)
+                throw AutoKonfigException("Failed to parse setting \"$key\", the value is \"$value\", but ${e.reason}")
             }
         }
         else default ?: throw AutoKonfigException("Required key \"$key\" is missing")

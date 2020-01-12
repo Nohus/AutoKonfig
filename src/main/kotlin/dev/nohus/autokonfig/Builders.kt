@@ -26,7 +26,7 @@ fun AutoKonfig.withConfig(file: File) = apply {
         val config = ConfigFactory.parseFile(file, ConfigParseOptions.defaults().setAllowMissing(false))
         withConfig(config, "config file at \"${file.normalize().absolutePath}\"")
     } catch (e: ConfigException) {
-        throw AutoKonfigException("Failed to read file: ${file.normalize().absolutePath}", e)
+        throw AutoKonfigException("Failed to read file: ${file.normalize().absolutePath} (${e.message})")
     }
 }
 
@@ -35,7 +35,7 @@ fun AutoKonfig.withResourceConfig(resource: String) = apply {
         val config = ConfigFactory.parseResources(resource, ConfigParseOptions.defaults().setAllowMissing(false))
         withConfig(config, "config file resource at \"$resource\"")
     } catch (e: ConfigException) {
-        throw AutoKonfigException("Failed to read resource: $resource", e)
+        throw AutoKonfigException("Failed to read resource: $resource (${e.message})")
     }
 }
 
@@ -44,7 +44,7 @@ fun AutoKonfig.withURLConfig(url: URL) = apply {
         val config = ConfigFactory.parseURL(url, ConfigParseOptions.defaults().setAllowMissing(false))
         withConfig(config, "config file at URL: $url")
     } catch (e: ConfigException) {
-        throw AutoKonfigException("Failed to read URL: $url", e)
+        throw AutoKonfigException("Failed to read URL: $url (${e.message})")
     }
 }
 
@@ -52,7 +52,7 @@ fun AutoKonfig.withURLConfig(url: String) {
     try {
         withURLConfig(URL(url))
     } catch (e: MalformedURLException) {
-        throw AutoKonfigException("Failed to read malformed URL: $url", e)
+        throw AutoKonfigException("Failed to read malformed URL: $url (${e.message})")
     }
 }
 

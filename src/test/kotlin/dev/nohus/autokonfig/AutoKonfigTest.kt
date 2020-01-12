@@ -329,7 +329,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withConfig(file)
         }
-        assertEquals("Failed to read file: ${file.normalize().absolutePath}", exception.message)
+        assertEquals("Failed to read file: ${file.normalize().absolutePath} (nonexistent: java.io.FileNotFoundException: nonexistent (No such file or directory))", exception.message)
     }
 
     @Test
@@ -337,7 +337,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withResourceConfig("nonexistent")
         }
-        assertEquals("Failed to read resource: nonexistent", exception.message)
+        assertEquals("Failed to read resource: nonexistent (nonexistent: java.io.IOException: resource not found on classpath: nonexistent)", exception.message)
     }
 
     @Test
@@ -345,7 +345,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withURLConfig("fake://URL")
         }
-        assertEquals("Failed to read malformed URL: fake://URL", exception.message)
+        assertEquals("Failed to read malformed URL: fake://URL (unknown protocol: fake)", exception.message)
     }
 
     @Test
@@ -353,7 +353,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withURLConfig("file://nonexistent")
         }
-        assertEquals("Failed to read URL: file://nonexistent", exception.message)
+        assertEquals("Failed to read URL: file://nonexistent (: java.io.FileNotFoundException:  (No such file or directory))", exception.message)
     }
 
     @Test

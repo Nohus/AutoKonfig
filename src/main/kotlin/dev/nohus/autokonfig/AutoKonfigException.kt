@@ -1,3 +1,7 @@
 package dev.nohus.autokonfig
 
-class AutoKonfigException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+/**
+ * Created by Marcin Wisniowski (Nohus) on 12/01/2020.
+ */
+
+class AutoKonfigException(message: String) : RuntimeException(message)
