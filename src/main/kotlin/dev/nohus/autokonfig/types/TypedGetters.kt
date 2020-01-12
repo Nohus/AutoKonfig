@@ -31,6 +31,7 @@ fun <T> AutoKonfig.getList(type: SettingType<T>, separator: String, key: String,
 fun <T> AutoKonfig.getSet(type: SettingType<T>, key: String, default: Set<T>? = null) = get(SetSettingType(type), key, default)
 fun <T> AutoKonfig.getSet(type: SettingType<T>, separator: Regex, key: String, default: Set<T>? = null) = get(SetSettingType(type, separator), key, default)
 fun <T> AutoKonfig.getSet(type: SettingType<T>, separator: String, key: String, default: Set<T>? = null) = get(SetSettingType(type, separator), key, default)
+fun AutoKonfig.getBytes(key: String, default: Long? = null): Long = get(BytesSettingType, key, default)
 fun AutoKonfig.getBoolean(key: String, default: Boolean? = null): Boolean = get(BooleanSettingType, key, default)
 fun AutoKonfig.getFlag(key: String): Boolean = getBoolean(key, false)
 
@@ -56,5 +57,6 @@ fun <T> AutoKonfig.Companion.getList(type: SettingType<T>, separator: String, ke
 fun <T> AutoKonfig.Companion.getSet(type: SettingType<T>, key: String, default: Set<T>? = null) = DefaultAutoKonfig.getSet(type, key, default)
 fun <T> AutoKonfig.Companion.getSet(type: SettingType<T>, separator: Regex, key: String, default: Set<T>? = null) = DefaultAutoKonfig.getSet(type, separator, key, default)
 fun <T> AutoKonfig.Companion.getSet(type: SettingType<T>, separator: String, key: String, default: Set<T>? = null) = DefaultAutoKonfig.getSet(type, separator, key, default)
+fun AutoKonfig.Companion.getBytes(key: String, default: Long? = null): Long = DefaultAutoKonfig.getBytes(key, default)
 fun AutoKonfig.Companion.getBoolean(key: String, default: Boolean? = null): Boolean = DefaultAutoKonfig.getBoolean(key, default)
 fun AutoKonfig.Companion.getFlag(key: String): Boolean = DefaultAutoKonfig.getFlag(key)

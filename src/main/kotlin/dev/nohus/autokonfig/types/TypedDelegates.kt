@@ -33,6 +33,7 @@ fun <T> AutoKonfig.ListSetting(type: SettingType<T>, separator: String, default:
 fun <T> AutoKonfig.SetSetting(type: SettingType<T>, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type), default, name, null)
 fun <T> AutoKonfig.SetSetting(type: SettingType<T>, separator: Regex, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type, separator), default, name, null)
 fun <T> AutoKonfig.SetSetting(type: SettingType<T>, separator: String, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type, separator), default, name, null)
+fun AutoKonfig.BytesSetting(default: Long? = null, name: String? = null) = getSettingProvider(BytesSettingType, default, name, null)
 fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null) = getSettingProvider(BooleanSettingType, default, name, null)
 fun AutoKonfig.FlagSetting(name: String? = null) = BooleanSetting(false, name)
 
@@ -58,6 +59,7 @@ fun <T> ListSetting(type: SettingType<T>, separator: String, default: List<T>? =
 fun <T> SetSetting(type: SettingType<T>, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, default, name)
 fun <T> SetSetting(type: SettingType<T>, separator: Regex, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, separator, default, name)
 fun <T> SetSetting(type: SettingType<T>, separator: String, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, separator, default, name)
+fun BytesSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.BytesSetting(default, name)
 fun BooleanSetting(default: Boolean? = null, name: String? = null) = DefaultAutoKonfig.BooleanSetting(default, name)
 fun FlagSetting(name: String? = null) = DefaultAutoKonfig.FlagSetting(name)
 
@@ -103,6 +105,7 @@ open class Group(name: String? = null) {
     fun <T> AutoKonfig.SetSetting(type: SettingType<T>, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type), default, name, this@Group)
     fun <T> AutoKonfig.SetSetting(type: SettingType<T>, separator: Regex, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type, separator), default, name, this@Group)
     fun <T> AutoKonfig.SetSetting(type: SettingType<T>, separator: String, default: Set<T>? = null, name: String? = null) = getSettingProvider(SetSettingType(type, separator), default, name, this@Group)
+    fun AutoKonfig.BytesSetting(default: Long? = null, name: String? = null) = getSettingProvider(BytesSettingType, default, name, this@Group)
     fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null) = getSettingProvider(BooleanSettingType, default, name, this@Group)
     fun AutoKonfig.FlagSetting(name: String? = null) = BooleanSetting(false, name)
 
@@ -128,6 +131,7 @@ open class Group(name: String? = null) {
     fun <T> SetSetting(type: SettingType<T>, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, default, name)
     fun <T> SetSetting(type: SettingType<T>, separator: Regex, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, separator, default, name)
     fun <T> SetSetting(type: SettingType<T>, separator: String, default: Set<T>? = null, name: String? = null) = DefaultAutoKonfig.SetSetting(type, separator, default, name)
+    fun BytesSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.BytesSetting(default, name)
     fun BooleanSetting(default: Boolean? = null, name: String? = null) = DefaultAutoKonfig.BooleanSetting(default, name)
     fun FlagSetting(name: String? = null) = DefaultAutoKonfig.FlagSetting(name)
 }

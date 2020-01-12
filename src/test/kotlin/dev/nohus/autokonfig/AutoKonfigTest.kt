@@ -9,7 +9,6 @@ import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.time.Duration
 import java.time.Period
-import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.reflect.jvm.isAccessible
 
@@ -238,6 +237,7 @@ class AutoKonfigTest {
             long = 3000000000
             float = 3.14
             double = 3.1415
+            bytes = 512kB
             boolean = false
             flag = true
         """.trimIndent().useAsProperties()
@@ -246,6 +246,7 @@ class AutoKonfigTest {
         val long by LongSetting()
         val float by FloatSetting()
         val double by DoubleSetting()
+        val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
         assertEquals("hello", string)
@@ -253,6 +254,7 @@ class AutoKonfigTest {
         assertEquals(3000000000, long)
         assertEquals(3.14f, float)
         assertEquals(3.1415, double)
+        assertEquals(512000, bytes)
         assertFalse(boolean)
         assertTrue(flag)
     }
@@ -263,6 +265,7 @@ class AutoKonfigTest {
         val long by LongSetting()
         val float by FloatSetting()
         val double by DoubleSetting()
+        val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
     }
@@ -275,6 +278,7 @@ class AutoKonfigTest {
             typesGroup.long = 3000000000
             typesGroup.float = 3.14
             typesGroup.double = 3.1415
+            typesGroup.bytes = 512kB
             typesGroup.boolean = false
             typesGroup.flag = true
         """.trimIndent().useAsProperties()
@@ -283,6 +287,7 @@ class AutoKonfigTest {
         assertEquals(3000000000, TypesGroup.long)
         assertEquals(3.14f, TypesGroup.float)
         assertEquals(3.1415, TypesGroup.double)
+        assertEquals(512000, TypesGroup.bytes)
         assertFalse(TypesGroup.boolean)
         assertTrue(TypesGroup.flag)
     }
@@ -295,6 +300,7 @@ class AutoKonfigTest {
             long = 3000000000
             float = 3.14
             double = 3.1415
+            bytes = 512kB
             boolean = false
             flag = true
         """.trimIndent().useAsProperties()
@@ -303,6 +309,7 @@ class AutoKonfigTest {
         assertEquals(3000000000, AutoKonfig.getLong("long"))
         assertEquals(3.14f, AutoKonfig.getFloat("float"))
         assertEquals(3.1415, AutoKonfig.getDouble("double"))
+        assertEquals(512000, AutoKonfig.getBytes("bytes"))
         assertFalse(AutoKonfig.getBoolean("boolean"))
         assertTrue(AutoKonfig.getFlag("flag"))
     }
@@ -638,7 +645,7 @@ class AutoKonfigTest {
     }
 
     @Test
-    fun `natural duration settings can be read`() {
+    fun `natural duration settings are parsed correctly`() {
         """
             plain = 10
             unit = 20s
@@ -690,7 +697,7 @@ class AutoKonfigTest {
     }
 
     @Test
-    fun `natural period settings can be read`() {
+    fun `natural period settings are parsed correctly`() {
         """
             plain = 10
             unit = 20m
@@ -739,6 +746,40 @@ class AutoKonfigTest {
             AutoKonfig.getPeriod("unitFirst")
         }
         assertEquals("Failed to parse setting \"unitFirst\", the value is \"days 10\", but it is missing a number", exception.message)
+    }
+
+    @Test
+    fun `bytes settings are parsed correctly`() {
+        """
+            a = 1
+            b = 1 b
+            c = 1 B
+            d = 1 byte
+            e = 1 bytes
+            f = 1 mebibyte
+            g = 1 mebibytes
+            h = 1 m
+            i = 1 M
+            j = 1 Mi
+            k = 1 MiB
+            l = 1 megabyte
+            m = 1 megabytes
+            n = 1 MB
+        """.trimIndent().useAsHocon()
+        assertEquals(1, AutoKonfig.getBytes("a"))
+        assertEquals(1, AutoKonfig.getBytes("b"))
+        assertEquals(1, AutoKonfig.getBytes("c"))
+        assertEquals(1, AutoKonfig.getBytes("d"))
+        assertEquals(1, AutoKonfig.getBytes("e"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("f"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("g"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("h"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("i"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("j"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("k"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("l"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("m"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("n"))
     }
 
     object Collections : Group() {

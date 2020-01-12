@@ -3,6 +3,8 @@
 package dev.nohus.autokonfig.types
 
 import dev.nohus.autokonfig.SettingParseException
+import dev.nohus.autokonfig.utils.MemoryUnit
+import java.math.BigInteger
 import java.time.*
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
@@ -33,6 +35,7 @@ fun <T> ListSettingType(type: SettingType<T>, separator: String): SettingType<Li
 fun <T> SetSettingType(type: SettingType<T>): SettingType<Set<T>> = SettingType { mapSet(it, type) }
 fun <T> SetSettingType(type: SettingType<T>, separator: Regex): SettingType<Set<T>> = SettingType { mapSet(it, type, separator) }
 fun <T> SetSettingType(type: SettingType<T>, separator: String): SettingType<Set<T>> = SettingType { mapSet(it, type, separator) }
+val BytesSettingType: SettingType<Long> = SettingType(::mapBytes)
 val BooleanSettingType: SettingType<Boolean> = SettingType(::mapBoolean)
 
 private fun mapString(value: String) = value
@@ -59,7 +62,7 @@ private val durationUnits = mapOf(
     listOf("d", "day", "days") to TimeUnit.DAYS
 )
 private fun mapDuration(value: String): Duration {
-    val duration = mapValueWithUnit(value, durationUnits) { it.toNanos(1) }
+    val duration = mapValueWithUnit(value, durationUnits) { it.toNanos(1).toBigInteger() }
     return Duration.ofNanos(duration)
 }
 private val periodUnits = mapOf(
@@ -69,21 +72,8 @@ private val periodUnits = mapOf(
     listOf("y", "year", "years") to ChronoUnit.YEARS
 )
 private fun mapPeriod(value: String): Period {
-    val duration = mapValueWithUnit(value, periodUnits) { it.duration.toDays() }
+    val duration = mapValueWithUnit(value, periodUnits) { it.duration.toDays().toBigInteger() }
     return Period.ofDays(duration.toInt())
-}
-private fun <T> mapValueWithUnit(value: String, units: Map<List<String>, T>, multiplier: (T) -> Long): Long {
-    val unitIndex = value.indexOfFirst { it.isLetter() }
-    val unitString = if (unitIndex > -1) value.substring(unitIndex) else ""
-    val numberString = (if (unitIndex > -1) value.substringBefore(unitString) else value).trim()
-    if (numberString.isEmpty()) throw SettingParseException("it is missing a number")
-
-    val unit = units.entries.firstOrNull { unitString in it.key }?.value
-        ?: throw SettingParseException("the unit \"$unitString\" must be one of ${units.keys.flatten().map { "\"$it\"" }}")
-
-    return numberString.toLongOrNull()?.let { multiplier(unit) * it }
-        ?: numberString.toDoubleOrNull()?.let { (multiplier(unit) * it).toLong() }
-        ?: throw SettingParseException("\"$numberString\" is not a number")
 }
 private fun mapLocalTime(value: String) = try { LocalTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalTime", e) }
 private fun mapLocalDate(value: String) = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
@@ -95,4 +85,27 @@ private fun <T> mapList(value: String, type: SettingType<T>, separator: String) 
 private fun <T> mapSet(value: String, type: SettingType<T>) = mapList(value, type).toSet()
 private fun <T> mapSet(value: String, type: SettingType<T>, separator: Regex) = mapList(value, type, separator).toSet()
 private fun <T> mapSet(value: String, type: SettingType<T>, separator: String) = mapList(value, type, separator).toSet()
+private fun mapBytes(value: String): Long {
+    return mapValueWithUnit(value, MemoryUnit.unitsMap) { it.bytes }
+}
 private fun mapBoolean(value: String) = value in listOf("true", "yes", "on", "1")
+
+private fun <T> mapValueWithUnit(value: String, units: Map<List<String>, T>, multiplier: (T) -> BigInteger): Long {
+    val (numberString, unitString) = getValueWithUnit(value)
+
+    val unit = units.entries.firstOrNull { unitString in it.key }?.value
+        ?: throw SettingParseException("the unit \"$unitString\" must be one of ${units.keys.flatten().map { "\"$it\"" }}")
+
+    return numberString.toBigIntegerOrNull()?.let { (multiplier(unit) * it).longValueExact() }
+        ?: numberString.toBigDecimalOrNull()?.let { (multiplier(unit).toBigDecimal() * it).toBigInteger().longValueExact() }
+        ?: throw SettingParseException("\"$numberString\" is not a number")
+}
+
+private fun getValueWithUnit(value: String): Pair<String, String> {
+    val unitIndex = value.indexOfFirst { it.isLetter() }
+    val unitString = if (unitIndex > -1) value.substring(unitIndex) else ""
+    val numberString = (if (unitIndex > -1) value.substringBefore(unitString) else value).trim()
+    if (numberString.isEmpty()) throw SettingParseException("it is missing a number")
+
+    return numberString to unitString
+}
