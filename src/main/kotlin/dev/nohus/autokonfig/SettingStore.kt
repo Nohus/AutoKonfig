@@ -12,14 +12,14 @@ internal class SettingStore {
 
     private val properties: Properties = Properties()
     private val flags = mutableSetOf<String>()
-    private val sources = mutableMapOf<String, SettingSource>()
+    private val sources = mutableMapOf<String, String>()
 
-    fun addProperty(key: String, value: String, source: SettingSource) {
+    fun addProperty(key: String, value: String, source: String) {
         properties[key] = value
         sources[key] = source
     }
 
-    fun addFlag(flag: String, source: SettingSource) {
+    fun addFlag(flag: String, source: String) {
         flags += flag
         sources[flag] = source
     }
