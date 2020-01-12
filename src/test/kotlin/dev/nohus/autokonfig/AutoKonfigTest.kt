@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.time.Duration
+import java.time.Period
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.reflect.jvm.isAccessible
 
@@ -540,6 +542,7 @@ class AutoKonfigTest {
     private object Temporal : Group() {
         val instant by InstantSetting()
         val duration by DurationSetting()
+        val period by PeriodSetting()
         val localTime by LocalTimeSetting()
         val localDate by LocalDateSetting()
         val localDateTime by LocalDateTimeSetting()
@@ -550,12 +553,14 @@ class AutoKonfigTest {
         """
             temporal.instant = 2011-12-03T10:15:30Z
             temporal.duration = 10s
+            temporal.period = 10d
             temporal.local-time = 10:15:30
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
         assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
         assertEquals(Duration.ofSeconds(10), Temporal.duration)
+        assertEquals(Period.ofDays(10), Temporal.period)
         assertEquals("10:15:30", Temporal.localTime.toString())
         assertEquals("2020-01-09", Temporal.localDate.toString())
         assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
@@ -566,17 +571,20 @@ class AutoKonfigTest {
         """
             instant = 2011-12-03T10:15:30Z
             duration = 10s
+            period = 10d
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
         val instant by InstantSetting()
         val duration by DurationSetting()
+        val period by PeriodSetting()
         val localTime by LocalTimeSetting()
         val localDate by LocalDateSetting()
         val localDateTime by LocalDateTimeSetting()
         assertEquals("2011-12-03T10:15:30Z", instant.toString())
         assertEquals(Duration.ofSeconds(10), duration)
+        assertEquals(Period.ofDays(10), period)
         assertEquals("10:15:30", localTime.toString())
         assertEquals("2020-01-09", localDate.toString())
         assertEquals("2020-01-09T10:15:30", localDateTime.toString())
@@ -669,7 +677,7 @@ class AutoKonfigTest {
         exception = assertThrows {
             AutoKonfig.getDuration("invalidUnit")
         }
-        assertEquals("Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the time unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]", exception.message)
+        assertEquals("Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]", exception.message)
         exception = assertThrows {
             AutoKonfig.getDuration("invalidNumber")
         }
@@ -679,6 +687,58 @@ class AutoKonfigTest {
             AutoKonfig.getDuration("unitFirst")
         }
         assertEquals("Failed to parse setting \"unitFirst\", the value is \"seconds 10\", but it is missing a number", exception.message)
+    }
+
+    @Test
+    fun `natural period settings can be read`() {
+        """
+            plain = 10
+            unit = 20m
+            space = 25 w
+            whitespace = 30    y
+            days = 50day
+            long = 100000 weeks
+            fraction = 0.5 month
+        """.trimIndent().useAsHocon()
+        assertEquals(Period.ofDays(10), AutoKonfig.getPeriod("plain"))
+        assertEquals(Period.ofDays(600), AutoKonfig.getPeriod("unit"))
+        assertEquals(Period.ofWeeks(25), AutoKonfig.getPeriod("space"))
+        assertEquals(Period.ofDays(10950), AutoKonfig.getPeriod("whitespace"))
+        assertEquals(Period.ofDays(50), AutoKonfig.getPeriod("days"))
+        assertEquals(Period.ofWeeks(100000), AutoKonfig.getPeriod("long"))
+        assertEquals(Period.ofDays(15), AutoKonfig.getPeriod("fraction"))
+    }
+
+    @Test
+    fun `invalid natural period values throw exceptions`() {
+        """
+            missing = 
+            onlyUnit = days
+            invalidUnit = 5 whiles
+            invalidNumber = 5.5.5 days
+            unitFirst = days 10
+        """.trimIndent().useAsProperties()
+        var exception: AutoKonfigException = assertThrows {
+            AutoKonfig.getPeriod("missing")
+        }
+        assertEquals("Failed to parse setting \"missing\", the value is \"\", but it is missing a number", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getPeriod("onlyUnit")
+        }
+        assertEquals("Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getPeriod("invalidUnit")
+        }
+        assertEquals("Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"d\", \"day\", \"days\", \"w\", \"week\", \"weeks\", \"m\", \"month\", \"months\", \"y\", \"year\", \"years\"]", exception.message)
+        exception = assertThrows {
+            AutoKonfig.getPeriod("invalidNumber")
+        }
+        assertEquals("Failed to parse setting \"invalidNumber\", the value is \"5.5.5 days\", but \"5.5.5\" is not a number", exception.message)
+
+        exception = assertThrows {
+            AutoKonfig.getPeriod("unitFirst")
+        }
+        assertEquals("Failed to parse setting \"unitFirst\", the value is \"days 10\", but it is missing a number", exception.message)
     }
 
     object Collections : Group() {

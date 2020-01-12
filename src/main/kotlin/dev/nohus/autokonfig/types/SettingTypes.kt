@@ -5,6 +5,7 @@ package dev.nohus.autokonfig.types
 import dev.nohus.autokonfig.SettingParseException
 import java.time.*
 import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -22,6 +23,7 @@ val DoubleSettingType: SettingType<Double> = SettingType(::mapDouble)
 fun <T : Enum<T>> EnumSettingType(enum: Class<T>): SettingType<T> = SettingType { mapEnum(it, enum) }
 val InstantSettingType: SettingType<Instant> = SettingType(::mapInstant)
 val DurationSettingType: SettingType<Duration> = SettingType(::mapDuration)
+val PeriodSettingType: SettingType<Period> = SettingType(::mapPeriod)
 val LocalTimeSettingType: SettingType<LocalTime> = SettingType(::mapLocalTime)
 val LocalDateSettingType: SettingType<LocalDate> = SettingType(::mapLocalDate)
 val LocalDateTimeSettingType: SettingType<LocalDateTime> = SettingType(::mapLocalDateTime)
@@ -57,19 +59,31 @@ private val durationUnits = mapOf(
     listOf("d", "day", "days") to TimeUnit.DAYS
 )
 private fun mapDuration(value: String): Duration {
+    val duration = mapValueWithUnit(value, durationUnits) { it.toNanos(1) }
+    return Duration.ofNanos(duration)
+}
+private val periodUnits = mapOf(
+    listOf("", "d", "day", "days") to ChronoUnit.DAYS,
+    listOf("w", "week", "weeks") to ChronoUnit.WEEKS,
+    listOf("m", "month", "months") to ChronoUnit.MONTHS,
+    listOf("y", "year", "years") to ChronoUnit.YEARS
+)
+private fun mapPeriod(value: String): Period {
+    val duration = mapValueWithUnit(value, periodUnits) { it.duration.toDays() }
+    return Period.ofDays(duration.toInt())
+}
+private fun <T> mapValueWithUnit(value: String, units: Map<List<String>, T>, multiplier: (T) -> Long): Long {
     val unitIndex = value.indexOfFirst { it.isLetter() }
     val unitString = if (unitIndex > -1) value.substring(unitIndex) else ""
     val numberString = (if (unitIndex > -1) value.substringBefore(unitString) else value).trim()
     if (numberString.isEmpty()) throw SettingParseException("it is missing a number")
 
-    val unit = durationUnits.entries.firstOrNull { unitString in it.key }?.value
-        ?: throw SettingParseException("the time unit \"$unitString\" must be one of ${durationUnits.keys.flatten().map { "\"$it\"" }}")
+    val unit = units.entries.firstOrNull { unitString in it.key }?.value
+        ?: throw SettingParseException("the unit \"$unitString\" must be one of ${units.keys.flatten().map { "\"$it\"" }}")
 
-    val nanos = unit.toNanos(1)
-    val duration = numberString.toLongOrNull()?.let { nanos * it }
-        ?: numberString.toDoubleOrNull()?.let { (nanos * it).toLong() }
+    return numberString.toLongOrNull()?.let { multiplier(unit) * it }
+        ?: numberString.toDoubleOrNull()?.let { (multiplier(unit) * it).toLong() }
         ?: throw SettingParseException("\"$numberString\" is not a number")
-    return Duration.ofNanos(duration)
 }
 private fun mapLocalTime(value: String) = try { LocalTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalTime", e) }
 private fun mapLocalDate(value: String) = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
