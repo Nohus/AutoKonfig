@@ -38,7 +38,7 @@ private fun mapLong(value: String) = try { value.toLong() } catch (e: NumberForm
 private fun mapFloat(value: String) = try { value.toFloat() } catch (e: NumberFormatException) { throw SettingParseException("must be a Float number", e) }
 private fun mapDouble(value: String) = try { value.toDouble() } catch (e: NumberFormatException) { throw SettingParseException("must be a Double number", e) }
 private fun <T : Enum<T>> mapEnum(value: String, enum: Class<T>): T {
-    val map = EnumSet.allOf(enum).map { it.name to it }.toMap()
+    val map = enum.enumConstants.map { it.name to it }.toMap()
     return try {
         map[value] ?: map.entries.first { it.key.toLowerCase(Locale.US) == value.toLowerCase(Locale.US) }.value
     } catch (e: NoSuchElementException) {
