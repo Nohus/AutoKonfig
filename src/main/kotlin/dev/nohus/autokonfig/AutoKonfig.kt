@@ -78,9 +78,5 @@ class AutoKonfig {
 
     fun <T> get(type: SettingType<T>, key: String, default: T? = null): T = getValue(key, type, default)
 
-    companion object {
-        fun clear() = DefaultAutoKonfig.clear()
-        fun getAll() = DefaultAutoKonfig.getAll()
-        fun getKeySource(key: String) = DefaultAutoKonfig.getKeySource(key)
-    }
+    companion object {}
 }

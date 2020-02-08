@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit
  */
 
 data class SettingType<T>(val transform: (String) -> T)
-
 val StringSettingType: SettingType<String> = SettingType(::mapString)
 val IntSettingType: SettingType<Int> = SettingType(::mapInt)
 val LongSettingType: SettingType<Long> = SettingType(::mapLong)
@@ -79,7 +78,13 @@ private fun mapLocalTime(value: String) = try { LocalTime.parse(value) } catch (
 private fun mapLocalDate(value: String) = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
 private fun mapLocalDateTime(value: String) = try { LocalDateTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDateTime", e) }
 private val separatorRegex = Regex(",\\s*")
-private fun <T> mapList(value: String, type: SettingType<T>) = value.split(separatorRegex).map { type.transform(it) }
+private fun <T> mapList(value: String, type: SettingType<T>): List<T> {
+    return value
+        .removePrefix("[")
+        .removeSuffix("]")
+        .split(separatorRegex)
+        .map { type.transform(it) }
+}
 private fun <T> mapList(value: String, type: SettingType<T>, separator: Regex) = value.split(separator).map { type.transform(it) }
 private fun <T> mapList(value: String, type: SettingType<T>, separator: String) = value.split(separator).map { type.transform(it) }
 private fun <T> mapSet(value: String, type: SettingType<T>) = mapList(value, type).toSet()

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 import java.time.Duration
+import java.time.LocalTime
 import java.time.Period
 import java.util.*
 import kotlin.reflect.jvm.isAccessible
@@ -329,7 +330,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withConfig(file)
         }
-        assertEquals("Failed to read file: ${file.normalize().absolutePath} (nonexistent: java.io.FileNotFoundException: nonexistent (No such file or directory))", exception.message)
+        assertEquals("Failed to read file: ${file.normalize().absolutePath}\nnonexistent: java.io.FileNotFoundException: nonexistent (No such file or directory)", exception.message)
     }
 
     @Test
@@ -337,7 +338,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withResourceConfig("nonexistent")
         }
-        assertEquals("Failed to read resource: nonexistent (nonexistent: java.io.IOException: resource not found on classpath: nonexistent)", exception.message)
+        assertEquals("Failed to read resource: nonexistent\nnonexistent: java.io.IOException: resource not found on classpath: nonexistent", exception.message)
     }
 
     @Test
@@ -353,7 +354,7 @@ class AutoKonfigTest {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withURLConfig("file://nonexistent")
         }
-        assertEquals("Failed to read URL: file://nonexistent (: java.io.FileNotFoundException:  (No such file or directory))", exception.message)
+        assertEquals("Failed to read URL: file://nonexistent\n: java.io.FileNotFoundException:  (No such file or directory)", exception.message)
     }
 
     @Test
@@ -645,6 +646,20 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `LocalTime settings are parsed correctly`() {
+        """
+            a = "05:00"
+            b = "22:30:00"
+            c = "07:20:40.5"
+            d = "08:10:20.000000001"
+        """.trimIndent().useAsHocon()
+        assertEquals(LocalTime.of(5, 0), AutoKonfig.getLocalTime("a"))
+        assertEquals(LocalTime.of(22, 30), AutoKonfig.getLocalTime("b"))
+        assertEquals(LocalTime.of(7, 20, 40, 500000000), AutoKonfig.getLocalTime("c"))
+        assertEquals(LocalTime.of(8, 10, 20, 1), AutoKonfig.getLocalTime("d"))
+    }
+
+    @Test
     fun `natural duration settings are parsed correctly`() {
         """
             plain = 10
@@ -850,6 +865,17 @@ class AutoKonfigTest {
     }
 
     @Test
+    fun `nested list settings can be read`() {
+        """
+            nested = 1 2 3|4 5 6|7 8 9
+        """.trimIndent().useAsProperties()
+        assertEquals(
+            listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9)),
+            AutoKonfig.getList(ListSettingType(IntSettingType, " "), "|", "nested")
+        )
+    }
+
+    @Test
     fun `parses json`() {
         """
             {
@@ -902,7 +928,113 @@ class AutoKonfigTest {
     fun `parses hocon with arrays`() {
         """
             foo = [1,2,3]
+            bar = [1,2,3,]
+            baz = [1, 2, 3, ]
         """.trimIndent().useAsHocon()
         assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "foo"))
+        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "bar"))
+        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "baz"))
+    }
+
+    @Test
+    fun `parses hocon with arrays with substitutions`() {
+        """
+            a = 1
+            b = 2
+            c = 3
+            d = 4
+            foo = [ ${'$'}{a} ${'$'}{b}, ${'$'}{c} ${'$'}{d} ]
+        """.trimIndent().useAsHocon()
+        assertEquals(listOf("1 2", "3 4"), AutoKonfig.getList(StringSettingType, "foo"))
+    }
+
+    @Test
+    fun `parses hocon with multi-line arrays`() {
+        """
+            foo = [ 1
+                    2
+                    3 ]
+        """.trimIndent().useAsHocon()
+        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "foo"))
+    }
+
+    @Test
+    fun `parses hocon with nested arrays`() {
+        """
+            foo = [ [ 1 ] ]
+        """.trimIndent().useAsHocon()
+        assertEquals(listOf(listOf(1)), AutoKonfig.getList(ListSettingType(IntSettingType), "foo"))
+    }
+
+    @Test
+    fun `parses hocon with comments`() {
+        """
+            // a
+            # b
+            foo = 15 // c
+        """.trimIndent().useAsHocon()
+        assertEquals(15, AutoKonfig.getInt("foo"))
+    }
+
+    @Test
+    fun `fields overwrite previous fields with the same name`() {
+        """
+            foo = 10
+            foo = 20
+        """.trimIndent().useAsHocon()
+        assertEquals(20, AutoKonfig.getInt("foo"))
+    }
+
+    @Test
+    fun `objects with the same keys merge`() {
+        """
+            foo { a:1, b:2 }
+            foo { b:3, c:4 }
+        """.trimIndent().useAsHocon()
+        assertEquals(1, AutoKonfig.getInt("foo.a"))
+        assertEquals(3, AutoKonfig.getInt("foo.b"))
+        assertEquals(4, AutoKonfig.getInt("foo.c"))
+    }
+
+    @Test
+    fun `multi-line strings parse correctly`() {
+        """
+            foo = ${"\"\"\""}a
+            b${"\"\"\"\""}
+        """.trimIndent().useAsHocon()
+        assertEquals("a\nb\"", AutoKonfig.getString("foo"))
+    }
+
+    @Test
+    fun `string concatenation parses correctly`() {
+        """
+            foo = foo bar baz
+            bar = 100 c
+            key with spaces = 20
+        """.trimIndent().useAsHocon()
+        assertEquals("foo bar baz", AutoKonfig.getString("foo"))
+        assertEquals("100 c", AutoKonfig.getString("bar"))
+        assertEquals(20, AutoKonfig.getInt("key with spaces"))
+    }
+
+    @Test
+    fun `object concatenation parses correctly`() {
+        """
+            foo = { a:1 } { b:2 }
+            bar = [ 1, 2 ] [ 3, 4 ]
+        """.trimIndent().useAsHocon()
+        assertEquals(1, AutoKonfig.getInt("foo.a"))
+        assertEquals(2, AutoKonfig.getInt("foo.b"))
+        assertEquals(listOf(1, 2, 3, 4), AutoKonfig.getList(IntSettingType, "bar"))
+    }
+
+    @Test
+    fun `path expressions with quotes work correctly`() {
+        """
+            foo."bar.baz" = 10
+            bar."".c = 20
+        """.trimIndent().useAsHocon()
+        assertEquals(10, AutoKonfig.getInt("foo.\"bar.baz\""))
+        assertEquals(20, AutoKonfig.getInt("bar.\"\".c"))
     }
 }
