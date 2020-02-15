@@ -3,7 +3,7 @@ package dev.nohus.autokonfig
 import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.CaseUtils.toKebabCase
 import dev.nohus.autokonfig.utils.CaseUtils.toSnakeCase
-import java.util.*
+import java.util.Locale
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 07/01/2020.

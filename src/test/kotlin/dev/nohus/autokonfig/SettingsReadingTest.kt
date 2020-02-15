@@ -1,6 +1,11 @@
 package dev.nohus.autokonfig
 
-import dev.nohus.autokonfig.types.*
+import dev.nohus.autokonfig.types.BigDecimalSetting
+import dev.nohus.autokonfig.types.BigIntegerSetting
+import dev.nohus.autokonfig.types.BooleanSetting
+import dev.nohus.autokonfig.types.Group
+import dev.nohus.autokonfig.types.IntSetting
+import dev.nohus.autokonfig.types.StringSetting
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

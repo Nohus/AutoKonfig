@@ -1,6 +1,10 @@
 package dev.nohus.autokonfig
 
-import com.typesafe.config.*
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigException
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigParseOptions
+import com.typesafe.config.ConfigResolveOptions
 import com.typesafe.config.ConfigValueType.LIST
 import dev.nohus.autokonfig.Value.ComplexValue
 import dev.nohus.autokonfig.Value.SimpleValue
@@ -10,7 +14,7 @@ import dev.nohus.autokonfig.utils.SourceUtil
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.*
+import java.util.Properties
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 06/01/2020.

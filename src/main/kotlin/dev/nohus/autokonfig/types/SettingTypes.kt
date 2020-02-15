@@ -10,10 +10,15 @@ import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.MemoryUnit
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.*
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Period
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**

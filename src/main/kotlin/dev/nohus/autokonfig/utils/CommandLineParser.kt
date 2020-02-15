@@ -18,7 +18,7 @@ class CommandLineParser {
     }
 
     private fun getNextIndex(args: List<String>, from: Int): Int? {
-        val index =  args.drop(from + 1).indexOfFirst { it.startsWith("-") }
+        val index = args.drop(from + 1).indexOfFirst { it.startsWith("-") }
         return if (index != -1) index + from + 1
         else null
     }

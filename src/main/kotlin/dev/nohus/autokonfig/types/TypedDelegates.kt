@@ -6,7 +6,12 @@ import dev.nohus.autokonfig.AutoKonfig
 import dev.nohus.autokonfig.DefaultAutoKonfig
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.*
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Period
 import kotlin.reflect.KClass
 
 /**
@@ -77,7 +82,7 @@ open class Group(name: String? = null) {
             (parentClass.kotlin.objectInstance as? Group)?.effectiveName?.let { names += it }
             parentClass = parentClass.enclosingClass
         }
-        names += effectiveName 
+        names += effectiveName
         names.joinToString(".")
     }
 

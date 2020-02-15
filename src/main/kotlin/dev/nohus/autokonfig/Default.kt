@@ -3,7 +3,7 @@ package dev.nohus.autokonfig
 import dev.nohus.autokonfig.utils.SourceUtil
 import java.io.File
 import java.net.URL
-import java.util.*
+import java.util.Properties
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 05/01/2020.

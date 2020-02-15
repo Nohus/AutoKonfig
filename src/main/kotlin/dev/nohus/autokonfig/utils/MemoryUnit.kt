@@ -1,4 +1,4 @@
-package dev.nohus.autokonfig.utils;
+package dev.nohus.autokonfig.utils
 
 import java.math.BigInteger
 

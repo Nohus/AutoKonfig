@@ -1,9 +1,9 @@
 package dev.nohus.autokonfig
 
+import java.util.Properties
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.util.*
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.

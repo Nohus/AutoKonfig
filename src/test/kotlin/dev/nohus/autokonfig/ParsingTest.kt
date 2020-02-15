@@ -1,6 +1,11 @@
 package dev.nohus.autokonfig
 
-import dev.nohus.autokonfig.types.*
+import dev.nohus.autokonfig.types.IntSettingType
+import dev.nohus.autokonfig.types.ListSettingType
+import dev.nohus.autokonfig.types.StringSettingType
+import dev.nohus.autokonfig.types.getInt
+import dev.nohus.autokonfig.types.getList
+import dev.nohus.autokonfig.types.getString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

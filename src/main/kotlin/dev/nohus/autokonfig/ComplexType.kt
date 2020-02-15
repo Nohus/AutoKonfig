@@ -1,6 +1,6 @@
 package dev.nohus.autokonfig
 
-import java.util.*
+import java.util.Locale
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 15/02/2020.

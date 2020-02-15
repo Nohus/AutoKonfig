@@ -39,8 +39,7 @@ class AutoKonfig {
             } catch (e: SettingParseException) {
                 throw AutoKonfigException("Failed to parse setting \"$key\", the value is \"$value\", but ${e.reason}")
             }
-        }
-        else default ?: throw AutoKonfigException("Required key \"$key\" is missing")
+        } else default ?: throw AutoKonfigException("Required key \"$key\" is missing")
     }
 
     open inner class SettingProvider<T>(
