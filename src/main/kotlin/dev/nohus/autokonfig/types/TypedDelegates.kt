@@ -4,6 +4,8 @@ package dev.nohus.autokonfig.types
 
 import dev.nohus.autokonfig.AutoKonfig
 import dev.nohus.autokonfig.DefaultAutoKonfig
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.*
 import kotlin.reflect.KClass
 
@@ -19,6 +21,8 @@ fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null) = getSetti
 fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null) = getSettingProvider(LongSettingType, default, name, null)
 fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null) = getSettingProvider(FloatSettingType, default, name, null)
 fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null) = getSettingProvider(DoubleSettingType, default, name, null)
+fun AutoKonfig.BigIntegerSetting(default: BigInteger? = null, name: String? = null) = getSettingProvider(BigIntegerSettingType, default, name, null)
+fun AutoKonfig.BigDecimalSetting(default: BigDecimal? = null, name: String? = null) = getSettingProvider(BigDecimalSettingType, default, name, null)
 fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: Class<T>, default: T? = null, name: String? = null) = getSettingProvider(EnumSettingType(enum), default, name, null)
 fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null) = EnumSetting(enum.java, default, name)
 fun AutoKonfig.InstantSetting(default: Instant? = null, name: String? = null) = getSettingProvider(InstantSettingType, default, name, null)
@@ -41,6 +45,8 @@ fun IntSetting(default: Int? = null, name: String? = null) = DefaultAutoKonfig.I
 fun LongSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.LongSetting(default, name)
 fun FloatSetting(default: Float? = null, name: String? = null) = DefaultAutoKonfig.FloatSetting(default, name)
 fun DoubleSetting(default: Double? = null, name: String? = null) = DefaultAutoKonfig.DoubleSetting(default, name)
+fun BigIntegerSetting(default: BigInteger? = null, name: String? = null) = DefaultAutoKonfig.BigIntegerSetting(default, name)
+fun BigDecimalSetting(default: BigDecimal? = null, name: String? = null) = DefaultAutoKonfig.BigDecimalSetting(default, name)
 fun <T : Enum<T>> EnumSetting(enum: Class<T>, default: T? = null, name: String? = null) = DefaultAutoKonfig.EnumSetting(enum, default, name)
 fun <T : Enum<T>> EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null) = DefaultAutoKonfig.EnumSetting(enum, default, name)
 fun InstantSetting(default: Instant? = null, name: String? = null) = DefaultAutoKonfig.InstantSetting(default, name)
@@ -82,6 +88,8 @@ open class Group(name: String? = null) {
     fun AutoKonfig.IntSetting(default: Int? = null, name: String? = null) = getSettingProvider(IntSettingType, default, name, this@Group)
     fun AutoKonfig.LongSetting(default: Long? = null, name: String? = null) = getSettingProvider(LongSettingType, default, name, this@Group)
     fun AutoKonfig.FloatSetting(default: Float? = null, name: String? = null) = getSettingProvider(FloatSettingType, default, name, this@Group)
+    fun AutoKonfig.BigIntegerSetting(default: BigInteger? = null, name: String? = null) = getSettingProvider(BigIntegerSettingType, default, name, this@Group)
+    fun AutoKonfig.BigDecimalSetting(default: BigDecimal? = null, name: String? = null) = getSettingProvider(BigDecimalSettingType, default, name, this@Group)
     fun AutoKonfig.DoubleSetting(default: Double? = null, name: String? = null) = getSettingProvider(DoubleSettingType, default, name, this@Group)
     fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: Class<T>, default: T? = null, name: String? = null) = getSettingProvider(EnumSettingType(enum), default, name, this@Group)
     fun <T : Enum<T>> AutoKonfig.EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null) = EnumSetting(enum.java, default, name)
@@ -105,6 +113,8 @@ open class Group(name: String? = null) {
     fun LongSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.LongSetting(default, name)
     fun FloatSetting(default: Float? = null, name: String? = null) = DefaultAutoKonfig.FloatSetting(default, name)
     fun DoubleSetting(default: Double? = null, name: String? = null) = DefaultAutoKonfig.DoubleSetting(default, name)
+    fun BigIntegerSetting(default: BigInteger? = null, name: String? = null) = DefaultAutoKonfig.BigIntegerSetting(default, name)
+    fun BigDecimalSetting(default: BigDecimal? = null, name: String? = null) = DefaultAutoKonfig.BigDecimalSetting(default, name)
     fun <T : Enum<T>> EnumSetting(enum: Class<T>, default: T? = null, name: String? = null) = DefaultAutoKonfig.EnumSetting(enum, default, name)
     fun <T : Enum<T>> EnumSetting(enum: KClass<T>, default: T? = null, name: String? = null) = DefaultAutoKonfig.EnumSetting(enum, default, name)
     fun InstantSetting(default: Instant? = null, name: String? = null) = DefaultAutoKonfig.InstantSetting(default, name)

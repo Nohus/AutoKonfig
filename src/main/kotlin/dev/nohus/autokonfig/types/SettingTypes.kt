@@ -8,6 +8,7 @@ import dev.nohus.autokonfig.Value
 import dev.nohus.autokonfig.Value.ComplexValue
 import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.MemoryUnit
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.*
 import java.time.format.DateTimeParseException
@@ -25,6 +26,8 @@ val IntSettingType: SettingType<Int> = SettingType(::mapInt)
 val LongSettingType: SettingType<Long> = SettingType(::mapLong)
 val FloatSettingType: SettingType<Float> = SettingType(::mapFloat)
 val DoubleSettingType: SettingType<Double> = SettingType(::mapDouble)
+val BigIntegerSettingType: SettingType<BigInteger> = SettingType(::mapBigInteger)
+val BigDecimalSettingType: SettingType<BigDecimal> = SettingType(::mapBigDecimal)
 fun <T : Enum<T>> EnumSettingType(enum: Class<T>): SettingType<T> = SettingType { mapEnum(it, enum) }
 val InstantSettingType: SettingType<Instant> = SettingType(::mapInstant)
 val DurationSettingType: SettingType<Duration> = SettingType(::mapDuration)
@@ -42,6 +45,8 @@ private fun mapInt(value: Value) = try { value.simple.toInt() } catch (e: Number
 private fun mapLong(value: Value) = try { value.simple.toLong() } catch (e: NumberFormatException) { throw SettingParseException("must be a Long number", e) }
 private fun mapFloat(value: Value) = try { value.simple.toFloat() } catch (e: NumberFormatException) { throw SettingParseException("must be a Float number", e) }
 private fun mapDouble(value: Value) = try { value.simple.toDouble() } catch (e: NumberFormatException) { throw SettingParseException("must be a Double number", e) }
+private fun mapBigInteger(value: Value) = try { value.simple.toBigInteger() } catch (e: NumberFormatException) { throw SettingParseException("must be a BigInteger number", e) }
+private fun mapBigDecimal(value: Value) = try { value.simple.toBigDecimal() } catch (e: NumberFormatException) { throw SettingParseException("must be a BigDecimal number", e) }
 private fun <T : Enum<T>> mapEnum(value: Value, enum: Class<T>): T {
     val map = enum.enumConstants.map { it.name to it }.toMap()
     return try {

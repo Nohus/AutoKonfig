@@ -1,9 +1,6 @@
 package dev.nohus.autokonfig
 
-import dev.nohus.autokonfig.types.BooleanSetting
-import dev.nohus.autokonfig.types.Group
-import dev.nohus.autokonfig.types.IntSetting
-import dev.nohus.autokonfig.types.StringSetting
+import dev.nohus.autokonfig.types.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -296,11 +293,25 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         """
             foo = test
         """.trimIndent().useAsProperties()
-        val exception = assertThrows<AutoKonfigException> {
+        var exception: AutoKonfigException = assertThrows {
             val a by IntSetting(name = "foo")
         }
         assertEquals(
             "Failed to parse setting \"foo\", the value is \"test\", but must be an Int number",
+            exception.message
+        )
+        exception = assertThrows {
+            val b by BigIntegerSetting(name = "foo")
+        }
+        assertEquals(
+            "Failed to parse setting \"foo\", the value is \"test\", but must be a BigInteger number",
+            exception.message
+        )
+        exception = assertThrows {
+            val c by BigDecimalSetting(name = "foo")
+        }
+        assertEquals(
+            "Failed to parse setting \"foo\", the value is \"test\", but must be a BigDecimal number",
             exception.message
         )
     }

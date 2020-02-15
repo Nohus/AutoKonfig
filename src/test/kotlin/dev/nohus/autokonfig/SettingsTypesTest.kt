@@ -61,6 +61,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val long by LongSetting()
         val float by FloatSetting()
         val double by DoubleSetting()
+        val bigInteger by BigIntegerSetting()
+        val bigDecimal by BigDecimalSetting()
         val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
@@ -74,6 +76,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             long = 3000000000
             float = 3.14
             double = 3.1415
+            bigInteger = 100000000000000000005
+            bigDecimal = 100000000000000000005.00000002
             bytes = 512kB
             boolean = false
             flag = true
@@ -83,6 +87,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val long by LongSetting()
         val float by FloatSetting()
         val double by DoubleSetting()
+        val bigInteger by BigIntegerSetting()
+        val bigDecimal by BigDecimalSetting()
         val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
@@ -91,6 +97,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(3000000000, long)
         assertEquals(3.14f, float)
         assertEquals(3.1415, double)
+        assertEquals("100000000000000000005".toBigInteger(), bigInteger)
+        assertEquals("100000000000000000005.00000002".toBigDecimal(), bigDecimal)
         assertEquals(512000, bytes)
         assertFalse(boolean)
         assertTrue(flag)
@@ -104,6 +112,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             typesGroup.long = 3000000000
             typesGroup.float = 3.14
             typesGroup.double = 3.1415
+            typesGroup.bigInteger = 100000000000000000005
+            typesGroup.bigDecimal = 100000000000000000005.00000002
             typesGroup.bytes = 512kB
             typesGroup.boolean = false
             typesGroup.flag = true
@@ -113,6 +123,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(3000000000, TypesGroup.long)
         assertEquals(3.14f, TypesGroup.float)
         assertEquals(3.1415, TypesGroup.double)
+        assertEquals("100000000000000000005".toBigInteger(), TypesGroup.bigInteger)
+        assertEquals("100000000000000000005.00000002".toBigDecimal(), TypesGroup.bigDecimal)
         assertEquals(512000, TypesGroup.bytes)
         assertFalse(TypesGroup.boolean)
         assertTrue(TypesGroup.flag)
@@ -126,6 +138,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             long = 3000000000
             float = 3.14
             double = 3.1415
+            bigInteger = 100000000000000000005
+            bigDecimal = 100000000000000000005.00000002
             bytes = 512kB
             boolean = false
             flag = true
@@ -135,6 +149,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(3000000000, AutoKonfig.getLong("long"))
         assertEquals(3.14f, AutoKonfig.getFloat("float"))
         assertEquals(3.1415, AutoKonfig.getDouble("double"))
+        assertEquals("100000000000000000005".toBigInteger(), AutoKonfig.getBigInteger("bigInteger"))
+        assertEquals("100000000000000000005.00000002".toBigDecimal(), AutoKonfig.getBigDecimal("bigDecimal"))
         assertEquals(512000, AutoKonfig.getBytes("bytes"))
         assertFalse(AutoKonfig.getBoolean("boolean"))
         assertTrue(AutoKonfig.getFlag("flag"))

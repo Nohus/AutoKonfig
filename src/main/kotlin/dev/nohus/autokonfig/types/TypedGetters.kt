@@ -2,6 +2,8 @@ package dev.nohus.autokonfig.types
 
 import dev.nohus.autokonfig.AutoKonfig
 import dev.nohus.autokonfig.DefaultAutoKonfig
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.*
 import kotlin.reflect.KClass
 
@@ -17,6 +19,8 @@ fun AutoKonfig.getInt(key: String, default: Int? = null): Int = get(IntSettingTy
 fun AutoKonfig.getLong(key: String, default: Long? = null): Long = get(LongSettingType, key, default)
 fun AutoKonfig.getFloat(key: String, default: Float? = null): Float = get(FloatSettingType, key, default)
 fun AutoKonfig.getDouble(key: String, default: Double? = null): Double = get(DoubleSettingType, key, default)
+fun AutoKonfig.getBigInteger(key: String, default: BigInteger? = null): BigInteger = get(BigIntegerSettingType, key, default)
+fun AutoKonfig.getBigDecimal(key: String, default: BigDecimal? = null): BigDecimal = get(BigDecimalSettingType, key, default)
 fun <T : Enum<T>> AutoKonfig.getEnum(enum: Class<T>, key: String, default: T?): T = get(EnumSettingType(enum), key, default)
 fun <T : Enum<T>> AutoKonfig.getEnum(enum: KClass<T>, key: String, default: T?): T = getEnum(enum.java, key, default)
 fun AutoKonfig.getInstant(key: String, default: Instant? = null): Instant = get(InstantSettingType, key, default)
@@ -39,6 +43,8 @@ fun AutoKonfig.Companion.getInt(key: String, default: Int? = null): Int = Defaul
 fun AutoKonfig.Companion.getLong(key: String, default: Long? = null): Long = DefaultAutoKonfig.getLong(key, default)
 fun AutoKonfig.Companion.getFloat(key: String, default: Float? = null): Float = DefaultAutoKonfig.getFloat(key, default)
 fun AutoKonfig.Companion.getDouble(key: String, default: Double? = null): Double = DefaultAutoKonfig.getDouble(key, default)
+fun AutoKonfig.Companion.getBigInteger(key: String, default: BigInteger? = null): BigInteger = DefaultAutoKonfig.getBigInteger(key, default)
+fun AutoKonfig.Companion.getBigDecimal(key: String, default: BigDecimal? = null): BigDecimal = DefaultAutoKonfig.getBigDecimal(key, default)
 fun <T : Enum<T>> AutoKonfig.Companion.getEnum(enum: Class<T>, key: String, default: T? = null): T = DefaultAutoKonfig.getEnum(enum, key, default)
 fun <T : Enum<T>> AutoKonfig.Companion.getEnum(enum: KClass<T>, key: String, default: T? = null): T = DefaultAutoKonfig.getEnum(enum, key, default)
 fun AutoKonfig.Companion.getInstant(key: String, default: Instant? = null): Instant = DefaultAutoKonfig.getInstant(key, default)
