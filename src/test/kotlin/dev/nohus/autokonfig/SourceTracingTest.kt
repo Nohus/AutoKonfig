@@ -1,6 +1,7 @@
 package dev.nohus.autokonfig
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -16,7 +17,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
             foo = 2
         """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
-        Assertions.assertEquals(
+        assertEquals(
             "Key \"foo\" was read from config file at \"${file.normalize().absolutePath}\"",
             AutoKonfig.getKeySource("foo")
         )
@@ -28,7 +29,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
             SERVER_PORT = 2
         """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
-        Assertions.assertEquals(
+        assertEquals(
             "Key \"serverPort\" was read as \"SERVER_PORT\" from config file at \"${file.normalize().absolutePath}\"",
             AutoKonfig.getKeySource("serverPort")
         )
@@ -37,7 +38,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
     @Test
     fun `setting can be traced to a resource file`() {
         val config = AutoKonfig.clear().withResourceConfig("resource.properties")
-        Assertions.assertEquals(
+        assertEquals(
             "Key \"setting\" was read from config file resource at \"resource.properties\"",
             config.getKeySource("setting")
         )
@@ -49,7 +50,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
         val value = "value"
         setEnvironmentVariable(key, value)
         resetDefaultAutoKonfig()
-        Assertions.assertEquals(
+        assertEquals(
             "Key \"unit.test.environment.variable\" was read from environment variables",
             AutoKonfig.getKeySource(key)
         )
@@ -61,7 +62,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
         val value = "value"
         System.setProperty(key, value)
         resetDefaultAutoKonfig()
-        Assertions.assertEquals(
+        assertEquals(
             "Key \"unit.test.system.property\" was read from system properties",
             AutoKonfig.getKeySource(key)
         )
@@ -70,7 +71,7 @@ class SourceTracingTest : BaseAutoKonfigTest() {
     @Test
     fun `setting can be traced to command line arguments`() {
         AutoKonfig.clear().withCommandLineArguments(arrayOf("-a", "b"))
-        Assertions.assertEquals("Key \"a\" was read from command line parameters", AutoKonfig.getKeySource("a"))
+        assertEquals("Key \"a\" was read from command line parameters", AutoKonfig.getKeySource("a"))
     }
 
     @Test

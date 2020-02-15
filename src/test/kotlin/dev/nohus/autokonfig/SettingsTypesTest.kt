@@ -1,7 +1,7 @@
 package dev.nohus.autokonfig
 
 import dev.nohus.autokonfig.types.*
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.Duration
@@ -34,14 +34,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val f by BooleanSetting()
         val g by BooleanSetting()
         val h by BooleanSetting()
-        Assertions.assertTrue(a)
-        Assertions.assertTrue(b)
-        Assertions.assertTrue(c)
-        Assertions.assertTrue(d)
-        Assertions.assertFalse(e)
-        Assertions.assertFalse(f)
-        Assertions.assertFalse(g)
-        Assertions.assertFalse(h)
+        assertTrue(a)
+        assertTrue(b)
+        assertTrue(c)
+        assertTrue(d)
+        assertFalse(e)
+        assertFalse(f)
+        assertFalse(g)
+        assertFalse(h)
     }
 
     @Test
@@ -51,8 +51,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         """.trimIndent().useAsProperties()
         val a by FlagSetting()
         val b by FlagSetting()
-        Assertions.assertTrue(a)
-        Assertions.assertFalse(b)
+        assertTrue(a)
+        assertFalse(b)
     }
 
     object TypesGroup : Group() {
@@ -86,14 +86,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
-        Assertions.assertEquals("hello", string)
-        Assertions.assertEquals(10, int)
-        Assertions.assertEquals(3000000000, long)
-        Assertions.assertEquals(3.14f, float)
-        Assertions.assertEquals(3.1415, double)
-        Assertions.assertEquals(512000, bytes)
-        Assertions.assertFalse(boolean)
-        Assertions.assertTrue(flag)
+        assertEquals("hello", string)
+        assertEquals(10, int)
+        assertEquals(3000000000, long)
+        assertEquals(3.14f, float)
+        assertEquals(3.1415, double)
+        assertEquals(512000, bytes)
+        assertFalse(boolean)
+        assertTrue(flag)
     }
 
     @Test
@@ -108,14 +108,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             typesGroup.boolean = false
             typesGroup.flag = true
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals("hello", TypesGroup.string)
-        Assertions.assertEquals(10, TypesGroup.int)
-        Assertions.assertEquals(3000000000, TypesGroup.long)
-        Assertions.assertEquals(3.14f, TypesGroup.float)
-        Assertions.assertEquals(3.1415, TypesGroup.double)
-        Assertions.assertEquals(512000, TypesGroup.bytes)
-        Assertions.assertFalse(TypesGroup.boolean)
-        Assertions.assertTrue(TypesGroup.flag)
+        assertEquals("hello", TypesGroup.string)
+        assertEquals(10, TypesGroup.int)
+        assertEquals(3000000000, TypesGroup.long)
+        assertEquals(3.14f, TypesGroup.float)
+        assertEquals(3.1415, TypesGroup.double)
+        assertEquals(512000, TypesGroup.bytes)
+        assertFalse(TypesGroup.boolean)
+        assertTrue(TypesGroup.flag)
     }
 
     @Test
@@ -130,14 +130,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             boolean = false
             flag = true
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals("hello", AutoKonfig.getString("string"))
-        Assertions.assertEquals(10, AutoKonfig.getInt("int"))
-        Assertions.assertEquals(3000000000, AutoKonfig.getLong("long"))
-        Assertions.assertEquals(3.14f, AutoKonfig.getFloat("float"))
-        Assertions.assertEquals(3.1415, AutoKonfig.getDouble("double"))
-        Assertions.assertEquals(512000, AutoKonfig.getBytes("bytes"))
-        Assertions.assertFalse(AutoKonfig.getBoolean("boolean"))
-        Assertions.assertTrue(AutoKonfig.getFlag("flag"))
+        assertEquals("hello", AutoKonfig.getString("string"))
+        assertEquals(10, AutoKonfig.getInt("int"))
+        assertEquals(3000000000, AutoKonfig.getLong("long"))
+        assertEquals(3.14f, AutoKonfig.getFloat("float"))
+        assertEquals(3.1415, AutoKonfig.getDouble("double"))
+        assertEquals(512000, AutoKonfig.getBytes("bytes"))
+        assertFalse(AutoKonfig.getBoolean("boolean"))
+        assertTrue(AutoKonfig.getFlag("flag"))
     }
 
     private enum class Letters {
@@ -154,8 +154,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         """
             EnumGroup.setting = Alpha
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals(Letters.Alpha, EnumGroup.setting)
-        Assertions.assertEquals(Letters.Alpha, EnumGroup.settingJava)
+        assertEquals(Letters.Alpha, EnumGroup.setting)
+        assertEquals(Letters.Alpha, EnumGroup.settingJava)
     }
 
     @Test
@@ -163,8 +163,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         """
             setting = Alpha
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
-        Assertions.assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
+        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
+        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
     }
 
     @Test
@@ -172,8 +172,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         """
             EnumGroup.setting = beTA
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals(Letters.Beta, EnumGroup.setting)
-        Assertions.assertEquals(Letters.Beta, EnumGroup.settingJava)
+        assertEquals(Letters.Beta, EnumGroup.setting)
+        assertEquals(Letters.Beta, EnumGroup.settingJava)
     }
 
     @Test
@@ -187,11 +187,11 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val exceptionJava = assertThrows<AutoKonfigException> {
             val settingJava by EnumSetting(Letters::class.java, name = "setting")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]",
             exception.message
         )
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]",
             exceptionJava.message
         )
@@ -213,12 +213,12 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val localTime by LocalTimeSetting()
         val localDate by LocalDateSetting()
         val localDateTime by LocalDateTimeSetting()
-        Assertions.assertEquals("2011-12-03T10:15:30Z", instant.toString())
-        Assertions.assertEquals(Duration.ofSeconds(10), duration)
-        Assertions.assertEquals(Period.ofDays(10), period)
-        Assertions.assertEquals("10:15:30", localTime.toString())
-        Assertions.assertEquals("2020-01-09", localDate.toString())
-        Assertions.assertEquals("2020-01-09T10:15:30", localDateTime.toString())
+        assertEquals("2011-12-03T10:15:30Z", instant.toString())
+        assertEquals(Duration.ofSeconds(10), duration)
+        assertEquals(Period.ofDays(10), period)
+        assertEquals("10:15:30", localTime.toString())
+        assertEquals("2020-01-09", localDate.toString())
+        assertEquals("2020-01-09T10:15:30", localDateTime.toString())
     }
 
     private object Temporal : Group() {
@@ -240,12 +240,12 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
-        Assertions.assertEquals(Duration.ofSeconds(10), Temporal.duration)
-        Assertions.assertEquals(Period.ofDays(10), Temporal.period)
-        Assertions.assertEquals("10:15:30", Temporal.localTime.toString())
-        Assertions.assertEquals("2020-01-09", Temporal.localDate.toString())
-        Assertions.assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
+        assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
+        assertEquals(Duration.ofSeconds(10), Temporal.duration)
+        assertEquals(Period.ofDays(10), Temporal.period)
+        assertEquals("10:15:30", Temporal.localTime.toString())
+        assertEquals("2020-01-09", Temporal.localDate.toString())
+        assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
     }
 
     @Test
@@ -257,11 +257,11 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
         """.trimIndent().useAsProperties()
-        Assertions.assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
-        Assertions.assertEquals(Duration.ofSeconds(10), AutoKonfig.getDuration("duration"))
-        Assertions.assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
-        Assertions.assertEquals("2020-01-09", AutoKonfig.getLocalDate("local-date").toString())
-        Assertions.assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
+        assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
+        assertEquals(Duration.ofSeconds(10), AutoKonfig.getDuration("duration"))
+        assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
+        assertEquals("2020-01-09", AutoKonfig.getLocalDate("local-date").toString())
+        assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
     }
 
     @Test
@@ -276,35 +276,35 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         var exception: AutoKonfigException = assertThrows {
             val instant by InstantSetting()
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"instant\", the value is \"invalid\", but must be an Instant",
             exception.message
         )
         exception = assertThrows {
             val duration by DurationSetting()
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"duration\", the value is \"invalid\", but it is missing a number",
             exception.message
         )
         exception = assertThrows {
             val localTime by LocalTimeSetting()
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"localTime\", the value is \"invalid\", but must be a LocalTime",
             exception.message
         )
         exception = assertThrows {
             val localDate by LocalDateSetting()
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"localDate\", the value is \"invalid\", but must be a LocalDate",
             exception.message
         )
         exception = assertThrows {
             val localDateTime by LocalDateTimeSetting()
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime",
             exception.message
         )
@@ -318,10 +318,10 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             c = "07:20:40.5"
             d = "08:10:20.000000001"
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(LocalTime.of(5, 0), AutoKonfig.getLocalTime("a"))
-        Assertions.assertEquals(LocalTime.of(22, 30), AutoKonfig.getLocalTime("b"))
-        Assertions.assertEquals(LocalTime.of(7, 20, 40, 500000000), AutoKonfig.getLocalTime("c"))
-        Assertions.assertEquals(LocalTime.of(8, 10, 20, 1), AutoKonfig.getLocalTime("d"))
+        assertEquals(LocalTime.of(5, 0), AutoKonfig.getLocalTime("a"))
+        assertEquals(LocalTime.of(22, 30), AutoKonfig.getLocalTime("b"))
+        assertEquals(LocalTime.of(7, 20, 40, 500000000), AutoKonfig.getLocalTime("c"))
+        assertEquals(LocalTime.of(8, 10, 20, 1), AutoKonfig.getLocalTime("d"))
     }
 
     @Test
@@ -335,13 +335,13 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             long = 100000 days
             fraction = 0.5 day
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(Duration.ofMillis(10), AutoKonfig.getDuration("plain"))
-        Assertions.assertEquals(Duration.ofSeconds(20), AutoKonfig.getDuration("unit"))
-        Assertions.assertEquals(Duration.ofSeconds(25), AutoKonfig.getDuration("space"))
-        Assertions.assertEquals(Duration.ofSeconds(30), AutoKonfig.getDuration("whitespace"))
-        Assertions.assertEquals(Duration.ofNanos(50), AutoKonfig.getDuration("nanos"))
-        Assertions.assertEquals(Duration.ofDays(100000), AutoKonfig.getDuration("long"))
-        Assertions.assertEquals(Duration.ofHours(12), AutoKonfig.getDuration("fraction"))
+        assertEquals(Duration.ofMillis(10), AutoKonfig.getDuration("plain"))
+        assertEquals(Duration.ofSeconds(20), AutoKonfig.getDuration("unit"))
+        assertEquals(Duration.ofSeconds(25), AutoKonfig.getDuration("space"))
+        assertEquals(Duration.ofSeconds(30), AutoKonfig.getDuration("whitespace"))
+        assertEquals(Duration.ofNanos(50), AutoKonfig.getDuration("nanos"))
+        assertEquals(Duration.ofDays(100000), AutoKonfig.getDuration("long"))
+        assertEquals(Duration.ofHours(12), AutoKonfig.getDuration("fraction"))
     }
 
     @Test
@@ -356,28 +356,28 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         var exception: AutoKonfigException = assertThrows {
             AutoKonfig.getDuration("missing")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"missing\", the value is \"\", but it is missing a number",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getDuration("onlyUnit")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getDuration("invalidUnit")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getDuration("invalidNumber")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 seconds\", but \"5.5.5\" is not a number",
             exception.message
         )
@@ -385,7 +385,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         exception = assertThrows {
             AutoKonfig.getDuration("unitFirst")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"unitFirst\", the value is \"seconds 10\", but it is missing a number",
             exception.message
         )
@@ -402,13 +402,13 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             long = 100000 weeks
             fraction = 0.5 month
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(Period.ofDays(10), AutoKonfig.getPeriod("plain"))
-        Assertions.assertEquals(Period.ofDays(600), AutoKonfig.getPeriod("unit"))
-        Assertions.assertEquals(Period.ofWeeks(25), AutoKonfig.getPeriod("space"))
-        Assertions.assertEquals(Period.ofDays(10950), AutoKonfig.getPeriod("whitespace"))
-        Assertions.assertEquals(Period.ofDays(50), AutoKonfig.getPeriod("days"))
-        Assertions.assertEquals(Period.ofWeeks(100000), AutoKonfig.getPeriod("long"))
-        Assertions.assertEquals(Period.ofDays(15), AutoKonfig.getPeriod("fraction"))
+        assertEquals(Period.ofDays(10), AutoKonfig.getPeriod("plain"))
+        assertEquals(Period.ofDays(600), AutoKonfig.getPeriod("unit"))
+        assertEquals(Period.ofWeeks(25), AutoKonfig.getPeriod("space"))
+        assertEquals(Period.ofDays(10950), AutoKonfig.getPeriod("whitespace"))
+        assertEquals(Period.ofDays(50), AutoKonfig.getPeriod("days"))
+        assertEquals(Period.ofWeeks(100000), AutoKonfig.getPeriod("long"))
+        assertEquals(Period.ofDays(15), AutoKonfig.getPeriod("fraction"))
     }
 
     @Test
@@ -423,28 +423,28 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         var exception: AutoKonfigException = assertThrows {
             AutoKonfig.getPeriod("missing")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"missing\", the value is \"\", but it is missing a number",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getPeriod("onlyUnit")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getPeriod("invalidUnit")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"d\", \"day\", \"days\", \"w\", \"week\", \"weeks\", \"m\", \"month\", \"months\", \"y\", \"year\", \"years\"]",
             exception.message
         )
         exception = assertThrows {
             AutoKonfig.getPeriod("invalidNumber")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 days\", but \"5.5.5\" is not a number",
             exception.message
         )
@@ -452,7 +452,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         exception = assertThrows {
             AutoKonfig.getPeriod("unitFirst")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"unitFirst\", the value is \"days 10\", but it is missing a number",
             exception.message
         )
@@ -476,20 +476,20 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             m = 1 megabytes
             n = 1 MB
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(1, AutoKonfig.getBytes("a"))
-        Assertions.assertEquals(1, AutoKonfig.getBytes("b"))
-        Assertions.assertEquals(1, AutoKonfig.getBytes("c"))
-        Assertions.assertEquals(1, AutoKonfig.getBytes("d"))
-        Assertions.assertEquals(1, AutoKonfig.getBytes("e"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("f"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("g"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("h"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("i"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("j"))
-        Assertions.assertEquals(1_048_576, AutoKonfig.getBytes("k"))
-        Assertions.assertEquals(1_000_000, AutoKonfig.getBytes("l"))
-        Assertions.assertEquals(1_000_000, AutoKonfig.getBytes("m"))
-        Assertions.assertEquals(1_000_000, AutoKonfig.getBytes("n"))
+        assertEquals(1, AutoKonfig.getBytes("a"))
+        assertEquals(1, AutoKonfig.getBytes("b"))
+        assertEquals(1, AutoKonfig.getBytes("c"))
+        assertEquals(1, AutoKonfig.getBytes("d"))
+        assertEquals(1, AutoKonfig.getBytes("e"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("f"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("g"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("h"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("i"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("j"))
+        assertEquals(1_048_576, AutoKonfig.getBytes("k"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("l"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("m"))
+        assertEquals(1_000_000, AutoKonfig.getBytes("n"))
     }
 
     object Collections : Group() {
@@ -505,8 +505,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         """.trimIndent().useAsHocon()
         val strings by ListSetting(StringSettingType)
         val numbers by SetSetting(IntSettingType)
-        Assertions.assertEquals(listOf("a", "b", "c"), strings)
-        Assertions.assertEquals(setOf(1, 2, 3), numbers)
+        assertEquals(listOf("a", "b", "c"), strings)
+        assertEquals(setOf(1, 2, 3), numbers)
     }
 
     @Test
@@ -515,8 +515,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             collections.strings = [a,b,c]
             collections.numbers = [1,2,3,2,1]
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(listOf("a", "b", "c"), Collections.strings)
-        Assertions.assertEquals(setOf(1, 2, 3), Collections.numbers)
+        assertEquals(listOf("a", "b", "c"), Collections.strings)
+        assertEquals(setOf(1, 2, 3), Collections.numbers)
     }
 
     @Test
@@ -525,8 +525,8 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             strings = [a,b,c]
             numbers = [1,2,3]
         """.trimIndent().useAsHocon()
-        Assertions.assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
-        Assertions.assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
+        assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
+        assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
     }
 
     @Test
@@ -535,7 +535,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             foo = [ 1 kB, 2 kilobytes, 3B ]
         """.trimIndent().useAsHocon()
         val foo by ListSetting(BytesSettingType)
-        Assertions.assertEquals(listOf(1000L, 2000L, 3L), foo)
+        assertEquals(listOf(1000L, 2000L, 3L), foo)
     }
 
     @Test
@@ -546,7 +546,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val exception: AutoKonfigException = assertThrows {
             val nested by ListSetting(ListSettingType(IntSettingType))
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"nested\", the value is \"[1, 2, 3]\", but list element \"1\" is not a list",
             exception.message
         )
@@ -560,7 +560,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val exception: AutoKonfigException = assertThrows {
             val list by ListSetting(IntSettingType)
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"list\", the value is \"[1, 2, c]\", but list element \"c\" must be an Int number",
             exception.message
         )
@@ -574,7 +574,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         val exception: AutoKonfigException = assertThrows {
             val list by ListSetting(IntSettingType)
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"list\", the value is \"[{a=1}]\", but list element \"{a=1}\" is unexpectedly of type \"object\"",
             exception.message
         )

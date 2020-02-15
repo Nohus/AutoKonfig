@@ -4,7 +4,6 @@ import dev.nohus.autokonfig.types.BooleanSetting
 import dev.nohus.autokonfig.types.Group
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.StringSetting
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -225,7 +224,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             val nonexistent by StringSetting()
         }
-        Assertions.assertEquals("Required key \"nonexistent\" is missing", exception.message)
+        assertEquals("Required key \"nonexistent\" is missing", exception.message)
     }
 
     @Test
@@ -234,7 +233,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withConfig(file)
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to read file: ${file.normalize().absolutePath}\nnonexistent: java.io.FileNotFoundException: nonexistent (No such file or directory)",
             exception.message
         )
@@ -245,7 +244,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withResourceConfig("nonexistent")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to read resource: nonexistent\nnonexistent: java.io.IOException: resource not found on classpath: nonexistent",
             exception.message
         )
@@ -256,7 +255,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withURLConfig("fake://URL")
         }
-        Assertions.assertEquals("Failed to read malformed URL: fake://URL (unknown protocol: fake)", exception.message)
+        assertEquals("Failed to read malformed URL: fake://URL (unknown protocol: fake)", exception.message)
     }
 
     @Test
@@ -264,7 +263,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig().withURLConfig("file://nonexistent")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to read URL: file://nonexistent\n: java.io.FileNotFoundException:  (No such file or directory)",
             exception.message
         )
@@ -278,7 +277,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         val exception = assertThrows<AutoKonfigException> {
             val a by IntSetting(name = "foo")
         }
-        Assertions.assertEquals(
+        assertEquals(
             "Failed to parse setting \"foo\", the value is \"test\", but must be an Int number",
             exception.message
         )
