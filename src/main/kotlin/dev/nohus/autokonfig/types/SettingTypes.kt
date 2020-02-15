@@ -92,7 +92,7 @@ private fun <T> mapSet(value: Value, type: SettingType<T>) = mapList(value, type
 private fun mapBytes(value: Value): Long {
     return mapValueWithUnit(value.simple, MemoryUnit.unitsMap) { it.bytes }
 }
-private fun mapBoolean(value: Value) = value.simple in listOf("true", "yes", "on", "1")
+private fun mapBoolean(value: Value) = value.simple.toLowerCase(Locale.US) in listOf("true", "yes", "on", "1")
 
 private fun <T> mapValueWithUnit(value: String, units: Map<List<String>, T>, multiplier: (T) -> BigInteger): Long {
     val (numberString, unitString) = getValueWithUnit(value)

@@ -18,12 +18,12 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
     fun `boolean settings can be read`() {
         """
             a = true
-            b = yes
+            b = Yes
             c = on
             d = 1
-            e = false
+            e = FALSE
             f = no
-            g = off
+            g = oFf
             h = 0
         """.trimIndent().useAsProperties()
         val a by BooleanSetting()
