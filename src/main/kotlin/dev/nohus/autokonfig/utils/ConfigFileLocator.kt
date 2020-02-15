@@ -9,11 +9,15 @@ import java.io.File
 class ConfigFileLocator(private val basePath: String = ".") {
 
     companion object {
-        private val VALID_EXTENSIONS = listOf("conf", "json", "properties", "config", "ini", "txt")
+        private val VALID_EXTENSIONS = listOf("conf", "json", "properties")
+        private val VALID_NAMES = listOf("autokonfig", "config", "application")
     }
 
     fun getConfigFiles(): List<File> {
-        return getReadableFiles().filter { it.extension in VALID_EXTENSIONS }
+        return getReadableFiles()
+            .filter { it.extension in VALID_EXTENSIONS }
+            .filter { it.nameWithoutExtension in VALID_NAMES }
+            .sortedBy { it.name }
     }
 
     private fun getReadableFiles(): List<File> {

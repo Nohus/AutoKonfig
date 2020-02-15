@@ -154,8 +154,8 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
     @Test
     fun `settings can be read from multiple files`() {
         val config = AutoKonfig().withConfigs(
-            File("src/test/resources/test/multiple/5.properties"),
-            File("src/test/resources/test/multiple/6.conf")
+            File("src/test/resources/test/multiple/application.properties"),
+            File("src/test/resources/test/multiple/autokonfig.conf")
         )
         val foo by config.StringSetting()
         val bar by config.StringSetting()
