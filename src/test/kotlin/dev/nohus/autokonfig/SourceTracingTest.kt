@@ -70,19 +70,23 @@ class SourceTracingTest : BaseAutoKonfigTest() {
 
     @Test
     fun `setting can be traced to command line arguments`() {
-        AutoKonfig.clear().withCommandLineArguments(arrayOf("-a", "b"))
+        AutoKonfig.withCommandLineArguments(arrayOf("-a", "b"))
         assertEquals("Key \"a\" was read from command line parameters", AutoKonfig.getKeySource("a"))
     }
 
     @Test
     fun `setting can be traced to manually inserted properties`() {
-        AutoKonfig.clear().withProperties(Properties().apply { put("a", "b") })
+        AutoKonfig.withProperties(Properties().apply { put("a", "b") })
+        DefaultAutoKonfig.withProperties(Properties().apply { put("c", "d") })
         Assertions.assertTrue(AutoKonfig.getKeySource("a").startsWith("Key \"a\" was read from properties inserted by org.junit"))
+        Assertions.assertTrue(AutoKonfig.getKeySource("c").startsWith("Key \"c\" was read from properties inserted by org.junit"))
     }
 
     @Test
     fun `setting can be traced to manually inserted map`() {
-        AutoKonfig.clear().withMap(mapOf("a" to "b"))
+        AutoKonfig.withMap(mapOf("a" to "b"))
+        DefaultAutoKonfig.withMap(mapOf("c" to "d"))
         Assertions.assertTrue(AutoKonfig.getKeySource("a").startsWith("Key \"a\" was read from a map inserted by org.junit"))
+        Assertions.assertTrue(AutoKonfig.getKeySource("c").startsWith("Key \"c\" was read from a map inserted by org.junit"))
     }
 }

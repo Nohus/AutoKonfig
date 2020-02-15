@@ -25,11 +25,12 @@ open class BaseAutoKonfigTest {
     }
 
     protected fun resetDefaultAutoKonfig() {
-        DefaultAutoKonfig
-            .clear()
-            .withSystemProperties()
-            .withEnvironmentVariables()
-            .withConfigs(ConfigFileLocator().getConfigFiles())
+        with(AutoKonfig) {
+            clear()
+            withSystemProperties()
+            withEnvironmentVariables()
+            withConfigs(ConfigFileLocator().getConfigFiles())
+        }
     }
 
     protected fun setEnvironmentVariable(key: String, value: String) {

@@ -127,7 +127,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
 
     @Test
     fun `setting can be read from config file in resources`() {
-        val config = AutoKonfig().withResourceConfig("resource.properties")
+        val config = AutoKonfig.withResourceConfig("resource.properties")
         val setting by config.StringSetting()
         assertEquals("resource", setting)
     }
@@ -137,14 +137,24 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         """
             setting = test
         """.trimIndent().useAsProperties()
-        AutoKonfig.clear().withURLConfig(file.toURI().toString())
+        AutoKonfig.withURLConfig(file.toURI().toURL())
+        val setting by StringSetting()
+        assertEquals("test", setting)
+    }
+
+    @Test
+    fun `setting can be read from config file by URL string`() {
+        """
+            setting = test
+        """.trimIndent().useAsProperties()
+        AutoKonfig.withURLConfig(file.toURI().toString())
         val setting by StringSetting()
         assertEquals("test", setting)
     }
 
     @Test
     fun `setting can be read from command line arguments`() {
-        val config = AutoKonfig().withCommandLineArguments(arrayOf("-a", "b", "-c"))
+        val config = AutoKonfig.withCommandLineArguments(arrayOf("-a", "b", "-c"))
         val a by config.StringSetting()
         val c by config.BooleanSetting()
         assertEquals("b", a)
@@ -153,10 +163,22 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
 
     @Test
     fun `settings can be read from multiple files`() {
-        val config = AutoKonfig().withConfigs(
+        val config = AutoKonfig.withConfigs(
             File("src/test/resources/test/multiple/application.properties"),
             File("src/test/resources/test/multiple/autokonfig.conf")
         )
+        val foo by config.StringSetting()
+        val bar by config.StringSetting()
+        assertEquals("abc", foo)
+        assertEquals("def", bar)
+    }
+
+    @Test
+    fun `settings can be read from a list of files`() {
+        val config = AutoKonfig.withConfigs(listOf(
+            File("src/test/resources/test/multiple/application.properties"),
+            File("src/test/resources/test/multiple/autokonfig.conf")
+        ))
         val foo by config.StringSetting()
         val bar by config.StringSetting()
         assertEquals("abc", foo)
@@ -231,7 +253,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
     fun `nonexistent config file throws an exception`() {
         val file = File("nonexistent")
         val exception = assertThrows<AutoKonfigException> {
-            AutoKonfig().withConfig(file)
+            AutoKonfig.withConfig(file)
         }
         assertEquals(
             "Failed to read file: ${file.normalize().absolutePath}\nnonexistent: java.io.FileNotFoundException: nonexistent (No such file or directory)",
@@ -242,7 +264,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
     @Test
     fun `nonexistent resources config file throws an exception`() {
         val exception = assertThrows<AutoKonfigException> {
-            AutoKonfig().withResourceConfig("nonexistent")
+            AutoKonfig.withResourceConfig("nonexistent")
         }
         assertEquals(
             "Failed to read resource: nonexistent\nnonexistent: java.io.IOException: resource not found on classpath: nonexistent",
@@ -253,7 +275,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
     @Test
     fun `malformed URL config file throws an exception`() {
         val exception = assertThrows<AutoKonfigException> {
-            AutoKonfig().withURLConfig("fake://URL")
+            AutoKonfig.withURLConfig("fake://URL")
         }
         assertEquals("Failed to read malformed URL: fake://URL (unknown protocol: fake)", exception.message)
     }
@@ -261,7 +283,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
     @Test
     fun `nonexistent URL config file throws an exception`() {
         val exception = assertThrows<AutoKonfigException> {
-            AutoKonfig().withURLConfig("file://nonexistent")
+            AutoKonfig.withURLConfig("file://nonexistent")
         }
         assertEquals(
             "Failed to read URL: file://nonexistent\n: java.io.FileNotFoundException:  (No such file or directory)",

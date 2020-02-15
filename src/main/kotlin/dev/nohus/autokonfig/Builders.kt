@@ -1,7 +1,7 @@
 package dev.nohus.autokonfig
 
 import com.typesafe.config.*
-import com.typesafe.config.ConfigValueType.*
+import com.typesafe.config.ConfigValueType.LIST
 import dev.nohus.autokonfig.Value.ComplexValue
 import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.CommandLineParser
@@ -79,9 +79,8 @@ private fun AutoKonfig.withConfig(config: Config, source: String) = apply {
 
             val configValue = resolved.getValue(it.key)
             val value = when (configValue.valueType()) {
-                OBJECT -> ComplexValue(configValue, ComplexType.OBJECT)
                 LIST -> ComplexValue(configValue, ComplexType.LIST)
-                NUMBER, BOOLEAN, NULL, STRING, null -> SimpleValue(resolved.getString(it.key))
+                else -> SimpleValue(resolved.getString(it.key))
             }
 
             cleanedKey to value
