@@ -6,6 +6,17 @@ object LibraryVersions {
     const val typeSafeConfig = "1.4.0"
 }
 
+buildscript {
+    repositories {
+        maven("https://plugins.gradle.org/m2/")
+    }
+    dependencies {
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
+    }
+}
+
+apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
 plugins {
     kotlin("jvm") version "1.3.61"
     `maven-publish`
