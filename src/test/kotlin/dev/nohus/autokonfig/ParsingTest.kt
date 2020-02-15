@@ -16,11 +16,11 @@ class ParsingTest : BaseAutoKonfigTest() {
             {
                 "foo" : {
                     "bar" : 10,
-                    "baz" : 12
+                    "baz" : [12]
                 }
             }
         """.trimIndent().useAsHocon()
-        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+        assertEquals(listOf(12), AutoKonfig.getList(IntSettingType, "foo.baz"))
     }
 
     @Test
@@ -49,14 +49,6 @@ class ParsingTest : BaseAutoKonfigTest() {
             bar = ${'$'}{foo}
         """.trimIndent().useAsHocon()
         assertEquals(15, AutoKonfig.getInt("bar"))
-    }
-
-    @Test
-    fun `parses whitespace separated collections`() {
-        """
-            foo : 20 10 10
-        """.trimIndent().useAsHocon()
-        assertEquals(setOf(20, 10), AutoKonfig.getSet(IntSettingType, " ", "foo"))
     }
 
     @Test
@@ -97,8 +89,10 @@ class ParsingTest : BaseAutoKonfigTest() {
     fun `parses nested arrays`() {
         """
             foo = [ [ 1 ] ]
+            bar = [ [1,2], [3,4] ]
         """.trimIndent().useAsHocon()
         assertEquals(listOf(listOf(1)), AutoKonfig.getList(ListSettingType(IntSettingType), "foo"))
+        assertEquals(listOf(listOf(1, 2), listOf(3, 4)), AutoKonfig.getList(ListSettingType(IntSettingType), "bar"))
     }
 
     @Test

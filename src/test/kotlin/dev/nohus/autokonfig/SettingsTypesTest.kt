@@ -494,19 +494,15 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
 
     object Collections : Group() {
         val strings by ListSetting(StringSettingType)
-        val strings2 by ListSetting(StringSettingType, ",", name = "strings")
-        val strings3 by ListSetting(StringSettingType, Regex(","), name = "strings")
         val numbers by SetSetting(IntSettingType)
-        val numbers2 by SetSetting(IntSettingType, ",", name = "numbers")
-        val numbers3 by SetSetting(IntSettingType, Regex(","), name = "numbers")
     }
 
     @Test
     fun `list settings can be read`() {
         """
-            strings = a,b,c
-            numbers = 1,2,3
-        """.trimIndent().useAsProperties()
+            strings = [a,b,c]
+            numbers = [1,2,3]
+        """.trimIndent().useAsHocon()
         val strings by ListSetting(StringSettingType)
         val numbers by SetSetting(IntSettingType)
         Assertions.assertEquals(listOf("a", "b", "c"), strings)
@@ -516,57 +512,71 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
     @Test
     fun `list settings can be read in a group`() {
         """
-            collections.strings = a,b,c
-            collections.numbers = 1,2,3,2,1
-        """.trimIndent().useAsProperties()
+            collections.strings = [a,b,c]
+            collections.numbers = [1,2,3,2,1]
+        """.trimIndent().useAsHocon()
         Assertions.assertEquals(listOf("a", "b", "c"), Collections.strings)
-        Assertions.assertEquals(listOf("a", "b", "c"), Collections.strings2)
-        Assertions.assertEquals(listOf("a", "b", "c"), Collections.strings3)
         Assertions.assertEquals(setOf(1, 2, 3), Collections.numbers)
-        Assertions.assertEquals(setOf(1, 2, 3), Collections.numbers2)
-        Assertions.assertEquals(setOf(1, 2, 3), Collections.numbers3)
     }
 
     @Test
     fun `list settings can be read directly`() {
         """
-            strings = a,b,c
-            numbers = 1,2,3
-        """.trimIndent().useAsProperties()
+            strings = [a,b,c]
+            numbers = [1,2,3]
+        """.trimIndent().useAsHocon()
         Assertions.assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
-        Assertions.assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, ",", "strings"))
-        Assertions.assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, Regex(","), "strings"))
         Assertions.assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
-        Assertions.assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, ",", "numbers"))
-        Assertions.assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, Regex(","), "numbers"))
     }
 
     @Test
-    fun `list settings with custom separators can be read`() {
+    fun `list settings with non-primitive types can be read`() {
         """
-            commas = 1,2,3
-            commasAndWhitespace = 1,  2,      3
-            dots = 1.2.3
-            complex = 1AbC2teSt3
-        """.trimIndent().useAsProperties()
-        val commas by ListSetting(IntSettingType, ",")
-        val commasAndWhitespace by ListSetting(IntSettingType, Regex(",\\s+"))
-        val dots by SetSetting(IntSettingType, ".")
-        val complex by SetSetting(IntSettingType, Regex("[A-z]+"))
-        Assertions.assertArrayEquals(listOf(1, 2, 3).toTypedArray(), commas.toTypedArray())
-        Assertions.assertArrayEquals(listOf(1, 2, 3).toTypedArray(), commasAndWhitespace.toTypedArray())
-        Assertions.assertArrayEquals(setOf(1, 2, 3).toTypedArray(), dots.toTypedArray())
-        Assertions.assertArrayEquals(setOf(1, 2, 3).toTypedArray(), complex.toTypedArray())
+            foo = [ 1 kB, 2 kilobytes, 3B ]
+        """.trimIndent().useAsHocon()
+        val foo by ListSetting(BytesSettingType)
+        Assertions.assertEquals(listOf(1000L, 2000L, 3L), foo)
     }
 
     @Test
-    fun `nested list settings can be read`() {
+    fun `list settings with missing brackets throw exceptions`() {
         """
-            nested = 1 2 3|4 5 6|7 8 9
-        """.trimIndent().useAsProperties()
+            nested = [1,2,3]
+        """.trimIndent().useAsHocon()
+        val exception: AutoKonfigException = assertThrows {
+            val nested by ListSetting(ListSettingType(IntSettingType))
+        }
         Assertions.assertEquals(
-            listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9)),
-            AutoKonfig.getList(ListSettingType(IntSettingType, " "), "|", "nested")
+            "Failed to parse setting \"nested\", the value is \"[1, 2, 3]\", but list element \"1\" is not a list",
+            exception.message
+        )
+    }
+
+    @Test
+    fun `list setting with a malformed value throws an exception`() {
+        """
+            list = [1,2,c]
+        """.trimIndent().useAsHocon()
+        val exception: AutoKonfigException = assertThrows {
+            val list by ListSetting(IntSettingType)
+        }
+        Assertions.assertEquals(
+            "Failed to parse setting \"list\", the value is \"[1, 2, c]\", but list element \"c\" must be an Int number",
+            exception.message
+        )
+    }
+
+    @Test
+    fun `list setting with unexpected complex type throws an exception`() {
+        """
+            list = [{a: 1}]
+        """.trimIndent().useAsHocon()
+        val exception: AutoKonfigException = assertThrows {
+            val list by ListSetting(IntSettingType)
+        }
+        Assertions.assertEquals(
+            "Failed to parse setting \"list\", the value is \"[{a=1}]\", but list element \"{a=1}\" is unexpectedly of type \"object\"",
+            exception.message
         )
     }
 }

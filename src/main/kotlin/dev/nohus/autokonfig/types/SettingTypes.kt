@@ -2,7 +2,11 @@
 
 package dev.nohus.autokonfig.types
 
+import com.typesafe.config.ConfigList
 import dev.nohus.autokonfig.SettingParseException
+import dev.nohus.autokonfig.Value
+import dev.nohus.autokonfig.Value.ComplexValue
+import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.MemoryUnit
 import java.math.BigInteger
 import java.time.*
@@ -15,7 +19,7 @@ import java.util.concurrent.TimeUnit
  * Created by Marcin Wisniowski (Nohus) on 11/01/2020.
  */
 
-data class SettingType<T>(val transform: (String) -> T)
+data class SettingType<T>(val transform: (Value) -> T)
 val StringSettingType: SettingType<String> = SettingType(::mapString)
 val IntSettingType: SettingType<Int> = SettingType(::mapInt)
 val LongSettingType: SettingType<Long> = SettingType(::mapLong)
@@ -29,28 +33,24 @@ val LocalTimeSettingType: SettingType<LocalTime> = SettingType(::mapLocalTime)
 val LocalDateSettingType: SettingType<LocalDate> = SettingType(::mapLocalDate)
 val LocalDateTimeSettingType: SettingType<LocalDateTime> = SettingType(::mapLocalDateTime)
 fun <T> ListSettingType(type: SettingType<T>): SettingType<List<T>> = SettingType { mapList(it, type) }
-fun <T> ListSettingType(type: SettingType<T>, separator: Regex): SettingType<List<T>> = SettingType { mapList(it, type, separator) }
-fun <T> ListSettingType(type: SettingType<T>, separator: String): SettingType<List<T>> = SettingType { mapList(it, type, separator) }
 fun <T> SetSettingType(type: SettingType<T>): SettingType<Set<T>> = SettingType { mapSet(it, type) }
-fun <T> SetSettingType(type: SettingType<T>, separator: Regex): SettingType<Set<T>> = SettingType { mapSet(it, type, separator) }
-fun <T> SetSettingType(type: SettingType<T>, separator: String): SettingType<Set<T>> = SettingType { mapSet(it, type, separator) }
 val BytesSettingType: SettingType<Long> = SettingType(::mapBytes)
 val BooleanSettingType: SettingType<Boolean> = SettingType(::mapBoolean)
 
-private fun mapString(value: String) = value
-private fun mapInt(value: String) = try { value.toInt() } catch (e: NumberFormatException) { throw SettingParseException("must be an Int number", e) }
-private fun mapLong(value: String) = try { value.toLong() } catch (e: NumberFormatException) { throw SettingParseException("must be a Long number", e) }
-private fun mapFloat(value: String) = try { value.toFloat() } catch (e: NumberFormatException) { throw SettingParseException("must be a Float number", e) }
-private fun mapDouble(value: String) = try { value.toDouble() } catch (e: NumberFormatException) { throw SettingParseException("must be a Double number", e) }
-private fun <T : Enum<T>> mapEnum(value: String, enum: Class<T>): T {
+private fun mapString(value: Value) = value.simple
+private fun mapInt(value: Value) = try { value.simple.toInt() } catch (e: NumberFormatException) { throw SettingParseException("must be an Int number", e) }
+private fun mapLong(value: Value) = try { value.simple.toLong() } catch (e: NumberFormatException) { throw SettingParseException("must be a Long number", e) }
+private fun mapFloat(value: Value) = try { value.simple.toFloat() } catch (e: NumberFormatException) { throw SettingParseException("must be a Float number", e) }
+private fun mapDouble(value: Value) = try { value.simple.toDouble() } catch (e: NumberFormatException) { throw SettingParseException("must be a Double number", e) }
+private fun <T : Enum<T>> mapEnum(value: Value, enum: Class<T>): T {
     val map = enum.enumConstants.map { it.name to it }.toMap()
     return try {
-        map[value] ?: map.entries.first { it.key.toLowerCase(Locale.US) == value.toLowerCase(Locale.US) }.value
+        map[value.simple] ?: map.entries.first { it.key.toLowerCase(Locale.US) == value.simple.toLowerCase(Locale.US) }.value
     } catch (e: NoSuchElementException) {
         throw SettingParseException("possible values are ${map.keys}", e)
     }
 }
-private fun mapInstant(value: String) = try { Instant.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be an Instant", e) }
+private fun mapInstant(value: Value) = try { Instant.parse(value.simple) } catch (e: DateTimeParseException) { throw SettingParseException("must be an Instant", e) }
 private val durationUnits = mapOf(
     listOf("", "ms", "millis", "milliseconds") to TimeUnit.MILLISECONDS,
     listOf("us", "micros", "microseconds") to TimeUnit.MICROSECONDS,
@@ -60,8 +60,8 @@ private val durationUnits = mapOf(
     listOf("h", "hour", "hours") to TimeUnit.HOURS,
     listOf("d", "day", "days") to TimeUnit.DAYS
 )
-private fun mapDuration(value: String): Duration {
-    val duration = mapValueWithUnit(value, durationUnits) { it.toNanos(1).toBigInteger() }
+private fun mapDuration(value: Value): Duration {
+    val duration = mapValueWithUnit(value.simple, durationUnits) { it.toNanos(1).toBigInteger() }
     return Duration.ofNanos(duration)
 }
 private val periodUnits = mapOf(
@@ -70,30 +70,29 @@ private val periodUnits = mapOf(
     listOf("m", "month", "months") to ChronoUnit.MONTHS,
     listOf("y", "year", "years") to ChronoUnit.YEARS
 )
-private fun mapPeriod(value: String): Period {
-    val duration = mapValueWithUnit(value, periodUnits) { it.duration.toDays().toBigInteger() }
+private fun mapPeriod(value: Value): Period {
+    val duration = mapValueWithUnit(value.simple, periodUnits) { it.duration.toDays().toBigInteger() }
     return Period.ofDays(duration.toInt())
 }
-private fun mapLocalTime(value: String) = try { LocalTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalTime", e) }
-private fun mapLocalDate(value: String) = try { LocalDate.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
-private fun mapLocalDateTime(value: String) = try { LocalDateTime.parse(value) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDateTime", e) }
-private val separatorRegex = Regex(",\\s*")
-private fun <T> mapList(value: String, type: SettingType<T>): List<T> {
-    return value
-        .removePrefix("[")
-        .removeSuffix("]")
-        .split(separatorRegex)
-        .map { type.transform(it) }
+private fun mapLocalTime(value: Value) = try { LocalTime.parse(value.simple) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalTime", e) }
+private fun mapLocalDate(value: Value) = try { LocalDate.parse(value.simple) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDate", e) }
+private fun mapLocalDateTime(value: Value) = try { LocalDateTime.parse(value.simple) } catch (e: DateTimeParseException) { throw SettingParseException("must be a LocalDateTime", e) }
+private fun <T> mapList(value: Value, type: SettingType<T>): List<T> {
+    if (value !is ComplexValue) throw SettingParseException("is not a list")
+    val configList = value.value as? ConfigList ?: throw SettingParseException("\"$value\" is not a list")
+    return configList.map {
+        try {
+            type.transform(Value.wrap(it))
+        } catch (e: SettingParseException) {
+            throw SettingParseException("list element \"${Value.wrap(it)}\" ${e.reason}", e)
+        }
+    }
 }
-private fun <T> mapList(value: String, type: SettingType<T>, separator: Regex) = value.split(separator).map { type.transform(it) }
-private fun <T> mapList(value: String, type: SettingType<T>, separator: String) = value.split(separator).map { type.transform(it) }
-private fun <T> mapSet(value: String, type: SettingType<T>) = mapList(value, type).toSet()
-private fun <T> mapSet(value: String, type: SettingType<T>, separator: Regex) = mapList(value, type, separator).toSet()
-private fun <T> mapSet(value: String, type: SettingType<T>, separator: String) = mapList(value, type, separator).toSet()
-private fun mapBytes(value: String): Long {
-    return mapValueWithUnit(value, MemoryUnit.unitsMap) { it.bytes }
+private fun <T> mapSet(value: Value, type: SettingType<T>) = mapList(value, type).toSet()
+private fun mapBytes(value: Value): Long {
+    return mapValueWithUnit(value.simple, MemoryUnit.unitsMap) { it.bytes }
 }
-private fun mapBoolean(value: String) = value in listOf("true", "yes", "on", "1")
+private fun mapBoolean(value: Value) = value.simple in listOf("true", "yes", "on", "1")
 
 private fun <T> mapValueWithUnit(value: String, units: Map<List<String>, T>, multiplier: (T) -> BigInteger): Long {
     val (numberString, unitString) = getValueWithUnit(value)
@@ -113,4 +112,12 @@ private fun getValueWithUnit(value: String): Pair<String, String> {
     if (numberString.isEmpty()) throw SettingParseException("it is missing a number")
 
     return numberString to unitString
+}
+
+private val Value.simple: String get() {
+    if (this is SimpleValue) return value
+    else {
+        val complex = this as ComplexValue
+        throw SettingParseException("is unexpectedly of type \"${complex.type}\"")
+    }
 }

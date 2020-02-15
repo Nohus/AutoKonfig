@@ -13,7 +13,7 @@ class AutoKonfig {
 
     private val settings = SettingStore()
 
-    internal fun addProperty(key: String, value: String, source: String) {
+    internal fun addProperty(key: String, value: Value, source: String) {
         settings.addProperty(key, value, source)
     }
 

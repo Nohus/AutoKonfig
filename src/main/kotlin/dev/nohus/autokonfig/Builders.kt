@@ -1,7 +1,9 @@
 package dev.nohus.autokonfig
 
 import com.typesafe.config.*
-import com.typesafe.config.ConfigValueType.LIST
+import com.typesafe.config.ConfigValueType.*
+import dev.nohus.autokonfig.Value.ComplexValue
+import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.CommandLineParser
 import dev.nohus.autokonfig.utils.ConfigFileLocator
 import dev.nohus.autokonfig.utils.SourceUtil
@@ -74,31 +76,19 @@ private fun AutoKonfig.withConfig(config: Config, source: String) = apply {
             val cleanedKey = if (it.key.startsWith("\"") && it.key.endsWith("\"")) {
                 it.key.removePrefix("\"").removeSuffix("\"")
             } else it.key
-            cleanedKey to getStringValue(resolved, it.key)
+
+            val configValue = resolved.getValue(it.key)
+            val value = when (configValue.valueType()) {
+                OBJECT -> ComplexValue(configValue, ComplexType.OBJECT)
+                LIST -> ComplexValue(configValue, ComplexType.LIST)
+                NUMBER, BOOLEAN, NULL, STRING, null -> SimpleValue(resolved.getString(it.key))
+            }
+
+            cleanedKey to value
         }
         .forEach { (key, value) ->
             addProperty(key, value, source)
         }
-}
-
-private fun getStringValue(config: Config, key: String): String {
-    return when (config.getValue(key).valueType()) {
-        LIST -> stringifyList(config.getList(key))
-        else -> config.getString(key)
-    }
-}
-
-private fun stringifyList(list: ConfigList): String {
-    return when {
-        list.isEmpty() -> "[]"
-        list.all { it.valueType() != LIST } -> {
-            "[" + list.joinToString(",") { it.unwrapped().toString() } + "]"
-        }
-        list.all { it.valueType() == LIST } -> {
-            "[" + list.joinToString(",") { stringifyList(it as ConfigList) } + "]"
-        }
-        else -> throw AutoKonfigException("Uhh...") // List with mixed list and non-list types, or list of objects
-    }
 }
 
 fun AutoKonfig.withEnvironmentVariables() = apply {
@@ -111,7 +101,7 @@ fun AutoKonfig.withSystemProperties() = apply {
 
 fun AutoKonfig.withCommandLineArguments(args: Array<String>) = apply {
     CommandLineParser().parse(args).forEach { (key, value) ->
-        if (value != null) addProperty(key, value, "command line parameters")
+        if (value != null) addProperty(key, SimpleValue(value), "command line parameters")
         else addFlag(key, "command line parameters")
     }
 }
@@ -128,6 +118,6 @@ fun AutoKonfig.withMap(
     source: String = SourceUtil.getReflectiveSource("a map")
 ) = apply {
     map.entries.forEach {
-        addProperty(it.key, it.value, source)
+        addProperty(it.key, SimpleValue(it.value), source)
     }
 }

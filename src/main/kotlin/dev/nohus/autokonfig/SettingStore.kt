@@ -1,5 +1,6 @@
 package dev.nohus.autokonfig
 
+import dev.nohus.autokonfig.Value.SimpleValue
 import dev.nohus.autokonfig.utils.CaseUtils.toKebabCase
 import dev.nohus.autokonfig.utils.CaseUtils.toSnakeCase
 import java.util.*
@@ -10,11 +11,11 @@ import java.util.*
 
 internal class SettingStore {
 
-    private val properties: Properties = Properties()
+    private val properties = mutableMapOf<String, Value>()
     private val flags = mutableSetOf<String>()
     private val sources = mutableMapOf<String, String>()
 
-    fun addProperty(key: String, value: String, source: String) {
+    fun addProperty(key: String, value: Value, source: String) {
         properties[key] = value
         sources[key] = source
     }
@@ -36,7 +37,7 @@ internal class SettingStore {
         return KeySource(key, matchingKey, source)
     }
 
-    fun findValue(key: String): String? {
+    fun findValue(key: String): Value? {
         return findMatchingKey(key)?.let { getValue(it) }
     }
 
@@ -64,8 +65,8 @@ internal class SettingStore {
         return listOf(key, key.toSnakeCase(), key.toKebabCase())
     }
 
-    private fun getValue(key: String): String? {
-        return properties.getProperty(key) ?: if (flags.contains(key)) true.toString() else null
+    private fun getValue(key: String): Value? {
+        return properties[key] ?: if (flags.contains(key)) SimpleValue(true.toString()) else null
     }
 
     private fun containsKey(key: String): Boolean {
