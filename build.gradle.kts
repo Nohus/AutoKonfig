@@ -45,7 +45,7 @@ object Setting {
     const val packageName = "dev.nohus.autokonfig"
     const val group = "dev.nohus"
     const val artifact = "AutoKonfig"
-    const val version = "0.0.1"
+    const val version = "1.0.0"
 }
 
 group = Setting.group
