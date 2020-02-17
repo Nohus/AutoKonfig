@@ -10,7 +10,7 @@ class ConfigFileLocator(private val basePath: String = ".") {
 
     companion object {
         private val VALID_EXTENSIONS = listOf("conf", "json", "properties")
-        private val VALID_NAMES = listOf("autokonfig", "config", "application")
+        private val VALID_NAMES = listOf("autokonfig", "config", "app", "application")
     }
 
     fun getConfigFiles(): List<File> {
