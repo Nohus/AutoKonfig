@@ -1,0 +1,53 @@
+site_name: AutoKonfig
+nav:
+    - Home: index.md
+    - Types: types.md
+    - HOCON: hocon.md
+repo_name: 'Nohus/AutoKonfig'
+repo_url: 'https://github.com/Nohus/AutoKonfig'
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+theme:
+  name: null
+  custom_dir: 'material'
+  language: en
+  feature:
+    # Another layer on top of the main navigation for larger screens in the form
+    # of tabs, especially useful for larger documentation projects
+    tabs: false
+
+  palette:
+    primary: teal
+    accent: light blue
+
+  # Fonts used by Material, automatically loaded from Google Fonts - see the site
+  # for a list of available fonts
+  font:
+    text: Roboto
+    code: Fira Code
+
+  # Favicon to be rendered
+  favicon: images/favicon.ico
+
+  # The logo of the documentation shown in the header and navigation can either
+  # be a Material Icon ligature (see https://material.io/icons/) or an image URL
+  logo:
+    icon: "settings"
+
+  # Material includes the search in the header as a partial, not as a separate
+  # template, so it's correct that search.html is missing
+  include_search_page: false
+
+  # Material doesn't use MkDocs search functionality but provides its own. For
+  # this reason, only the search index needs to be built
+  search_index_only: true
+
+  # Static pages to build
+  static_templates:
+    - 404.html
+extra_css:
+  - css/extra.css
