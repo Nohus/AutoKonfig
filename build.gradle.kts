@@ -62,8 +62,8 @@ publishing {
 
             pom {
                 name.set("AutoKonfig")
-                description.set("Kotlin configuration library")
-                url.set("https://gitlab.com/Nohus/AutoKonfig")
+                description.set("Kotlin configuration library with batteries included")
+                url.set("https://autokonfig.nohus.dev/")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -71,9 +71,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://gitlab.com/Nohus/AutoKonfig.git")
-                    developerConnection.set("scm:git:git://gitlab.com/Nohus/AutoKonfig.git")
-                    url.set("https://gitlab.com/Nohus/AutoKonfig")
+                    connection.set("scm:git:git://github.com/Nohus/AutoKonfig.git")
+                    developerConnection.set("scm:git:git://github.com/Nohus/AutoKonfig.git")
+                    url.set("https://github.com/Nohus/AutoKonfig")
                 }
                 developers {
                     developer {
