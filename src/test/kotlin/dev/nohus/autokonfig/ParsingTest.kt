@@ -1,11 +1,13 @@
 package dev.nohus.autokonfig
 
+import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.IntSettingType
 import dev.nohus.autokonfig.types.ListSettingType
 import dev.nohus.autokonfig.types.StringSettingType
 import dev.nohus.autokonfig.types.getInt
 import dev.nohus.autokonfig.types.getList
 import dev.nohus.autokonfig.types.getString
+import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -101,6 +103,15 @@ class ParsingTest : BaseAutoKonfigTest() {
     }
 
     @Test
+    fun `parses plus-equals arrays`() {
+        """
+            foo = [ 1 ]
+            foo += 2
+        """.trimIndent().useAsHocon()
+        assertEquals(listOf(1, 2), AutoKonfig.getList(IntSettingType, "foo"))
+    }
+
+    @Test
     fun `parses comments`() {
         """
             // a
@@ -170,5 +181,12 @@ class ParsingTest : BaseAutoKonfigTest() {
         """.trimIndent().useAsHocon()
         assertEquals(10, AutoKonfig.getInt("foo.\"bar.baz\""))
         assertEquals(20, AutoKonfig.getInt("bar.\"\".c"))
+    }
+
+    @Test
+    fun `parses includes`() {
+        AutoKonfig.withConfig(File("src/test/resources/test/include/main.conf"))
+        val a by IntSetting(name = "root.a")
+        assertEquals(10, a)
     }
 }

@@ -43,14 +43,14 @@ import dev.nohus.autokonfig.types.getLong
 import dev.nohus.autokonfig.types.getPeriod
 import dev.nohus.autokonfig.types.getSet
 import dev.nohus.autokonfig.types.getString
+import java.time.Duration
+import java.time.LocalTime
+import java.time.Period
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.Duration
-import java.time.LocalTime
-import java.time.Period
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.

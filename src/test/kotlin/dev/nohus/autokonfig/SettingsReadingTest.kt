@@ -6,11 +6,11 @@ import dev.nohus.autokonfig.types.BooleanSetting
 import dev.nohus.autokonfig.types.Group
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.StringSetting
+import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.io.File
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.
@@ -319,5 +319,12 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
             "Failed to parse setting \"foo\", the value is \"test\", but must be a BigDecimal number",
             exception.message
         )
+    }
+
+    @Test
+    fun `invalid required include throws an exception`() {
+        assertThrows<AutoKonfigException> {
+            AutoKonfig.withConfig(File("src/test/resources/test/include/invalid.conf"))
+        }
     }
 }
