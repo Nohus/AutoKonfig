@@ -1,6 +1,6 @@
 # AutoKonfig
 
-![AutoKonfig](images/AutoKonfig.png)
+![AutoKonfig](https://autokonfig.nohus.dev/images/AutoKonfig.png)
 
 Kotlin configuration library with batteries included.
 
