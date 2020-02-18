@@ -6,7 +6,7 @@ Kotlin configuration library with batteries included.
 
 [![License](https://img.shields.io/badge/license-Apache%202%20-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/Nohus/AutoKonfig/tree/master/src/test/kotlin/dev/nohus/autokonfig)
-[![Version](https://img.shields.io/bintray/v/nohus/Nohus/AutoKonfig)]()
+[![Version](https://img.shields.io/bintray/v/nohus/Nohus/AutoKonfig)](https://bintray.com/beta/#/nohus/Nohus/AutoKonfig)
 
 ## Features overview
 - Support for JSON, [HOCON](/hocon) and Java properties config files
@@ -37,6 +37,8 @@ implementation "dev.nohus:AutoKonfig:1.0.0"
     <version>1.0.0</version>
 </dependency>
 ```
+
+The artifacts are available on JCenter.
 
 ## Simple example
 
