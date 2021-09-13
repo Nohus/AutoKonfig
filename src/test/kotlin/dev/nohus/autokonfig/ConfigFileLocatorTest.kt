@@ -26,11 +26,14 @@ class ConfigFileLocatorTest {
     @Test
     fun `finds multiple config files`() {
         val locator = createLocator("multiple")
-        assertEquals(listOf(
-            "application.conf", "application.json", "application.properties",
-            "autokonfig.conf", "autokonfig.json", "autokonfig.properties",
-            "config.conf", "config.json", "config.properties"
-        ), locator.getConfigFiles().map { it.name })
+        assertEquals(
+            listOf(
+                "application.conf", "application.json", "application.properties",
+                "autokonfig.conf", "autokonfig.json", "autokonfig.properties",
+                "config.conf", "config.json", "config.properties"
+            ),
+            locator.getConfigFiles().map { it.name }
+        )
     }
 
     @Test

@@ -16,7 +16,8 @@ object SourceUtil {
     private fun getExternalStackFrame(): StackTraceElement {
         val internalNames = listOf(AutoKonfig::class.java.packageName, "java.", "jdk.", "kotlin.")
         return Thread.currentThread().stackTrace.first {
-                frame -> !internalNames.any { frame.className.startsWith(it) }
+            frame ->
+            !internalNames.any { frame.className.startsWith(it) }
         }
     }
 }

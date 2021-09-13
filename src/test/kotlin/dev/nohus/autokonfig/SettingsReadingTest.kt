@@ -6,11 +6,11 @@ import dev.nohus.autokonfig.types.BooleanSetting
 import dev.nohus.autokonfig.types.Group
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.StringSetting
-import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.io.File
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.
@@ -177,10 +177,12 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
 
     @Test
     fun `settings can be read from a list of files`() {
-        val config = AutoKonfig.withConfigs(listOf(
-            File("src/test/resources/test/multiple/application.properties"),
-            File("src/test/resources/test/multiple/autokonfig.conf")
-        ))
+        val config = AutoKonfig.withConfigs(
+            listOf(
+                File("src/test/resources/test/multiple/application.properties"),
+                File("src/test/resources/test/multiple/autokonfig.conf")
+            )
+        )
         val foo by config.StringSetting()
         val bar by config.StringSetting()
         assertEquals("abc", foo)
@@ -236,10 +238,13 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
             b = 2
         """.trimIndent().useAsProperties()
         AutoKonfig.clear().withConfig(file)
-        assertEquals(mapOf(
-            "a" to "1",
-            "b" to "2"
-        ), AutoKonfig.getAll())
+        assertEquals(
+            mapOf(
+                "a" to "1",
+                "b" to "2"
+            ),
+            AutoKonfig.getAll()
+        )
     }
 
     @Test

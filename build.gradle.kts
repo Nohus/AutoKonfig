@@ -11,15 +11,13 @@ buildscript {
         maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:9.2.1")
     }
 }
-
-apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
 plugins {
     kotlin("jvm") version "1.5.30"
     `maven-publish`
+    id("com.diffplug.spotless") version "5.15.0"
 }
 
 repositories {
@@ -50,6 +48,12 @@ object Setting {
 
 group = Setting.group
 version = Setting.version
+
+spotless {
+    kotlin {
+        ktlint("0.42.1")
+    }
+}
 
 publishing {
     publications {

@@ -7,9 +7,9 @@ import dev.nohus.autokonfig.types.StringSettingType
 import dev.nohus.autokonfig.types.getInt
 import dev.nohus.autokonfig.types.getList
 import dev.nohus.autokonfig.types.getString
-import java.io.File
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.

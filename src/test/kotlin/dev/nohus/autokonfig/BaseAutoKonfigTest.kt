@@ -1,9 +1,9 @@
 package dev.nohus.autokonfig
 
 import dev.nohus.autokonfig.utils.ConfigFileLocator
+import org.junit.jupiter.api.AfterEach
 import java.io.File
 import kotlin.reflect.jvm.isAccessible
-import org.junit.jupiter.api.AfterEach
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.

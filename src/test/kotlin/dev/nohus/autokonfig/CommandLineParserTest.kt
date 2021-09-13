@@ -14,21 +14,27 @@ class CommandLineParserTest {
     @Test
     fun `parses values`() {
         val map = CommandLineParser().parse(arrayOf("-a", "b", "--cfg", "d", "-g", "fg"))
-        assertEquals(mapOf(
-            "a" to "b",
-            "cfg" to "d",
-            "g" to "fg"
-        ), map)
+        assertEquals(
+            mapOf(
+                "a" to "b",
+                "cfg" to "d",
+                "g" to "fg"
+            ),
+            map
+        )
     }
 
     @Test
     fun `parses flags`() {
         val map = CommandLineParser().parse(arrayOf("-a", "b", "-c", "--test"))
-        assertEquals(mapOf(
-            "a" to "b",
-            "c" to null,
-            "test" to null
-        ), map)
+        assertEquals(
+            mapOf(
+                "a" to "b",
+                "c" to null,
+                "test" to null
+            ),
+            map
+        )
     }
 
     @Test
@@ -40,10 +46,13 @@ class CommandLineParserTest {
     @Test
     fun `ignores values without keys`() {
         val map = CommandLineParser().parse(arrayOf("-a", "foo", "bar", "--foo", "bar", "baz"))
-        assertEquals(mapOf(
-            "a" to "foo",
-            "foo" to "bar"
-        ), map)
+        assertEquals(
+            mapOf(
+                "a" to "foo",
+                "foo" to "bar"
+            ),
+            map
+        )
     }
 
     @Test
@@ -51,9 +60,12 @@ class CommandLineParserTest {
         val map = CommandLineParser().parse(
             arrayOf("--a", "1", "2", "3", "--quoted", "this is quoted")
         )
-        assertEquals(mapOf(
-            "a" to "1",
-            "quoted" to "this is quoted"
-        ), map)
+        assertEquals(
+            mapOf(
+                "a" to "1",
+                "quoted" to "this is quoted"
+            ),
+            map
+        )
     }
 }
