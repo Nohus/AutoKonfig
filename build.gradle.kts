@@ -2,8 +2,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 object LibraryVersions {
-    const val kotlin = "1.3.61"
-    const val typeSafeConfig = "1.4.0"
+    const val kotlin = "1.5.30"
+    const val typeSafeConfig = "1.4.1"
 }
 
 buildscript {
@@ -18,12 +18,12 @@ buildscript {
 apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.5.30"
     `maven-publish`
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
