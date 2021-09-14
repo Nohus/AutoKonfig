@@ -24,7 +24,7 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                groupId "dev.nohus.autokonfig"
+                groupId "dev.nohus"
                 artifactId "AutoKonfig"
                 version "1.0.1"
 
