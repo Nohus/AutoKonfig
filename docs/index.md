@@ -6,7 +6,7 @@ Kotlin configuration library with batteries included.
 
 [![License](https://img.shields.io/badge/license-Apache%202%20-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/Nohus/AutoKonfig/tree/master/src/test/kotlin/dev/nohus/autokonfig)
-[![Version](https://img.shields.io/bintray/v/nohus/Nohus/AutoKonfig)](https://bintray.com/beta/#/nohus/Nohus/AutoKonfig)
+[![Version](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Fdev%2Fnohus%2Fautokonfig%2FAutoKonfig%2Fmaven-metadata.xml)](https://search.maven.org/artifact/dev.nohus.autokonfig/AutoKonfig)
 
 ## Features overview
 - Support for JSON, [HOCON](/hocon) and Java properties config files
@@ -26,7 +26,7 @@ depending on which type is asked for
 
 #### Gradle
 ``` Groovy
-implementation "dev.nohus:AutoKonfig:1.0.0"
+implementation "dev.nohus:AutoKonfig:1.0.1"
 ```
 
 #### Maven
@@ -34,11 +34,11 @@ implementation "dev.nohus:AutoKonfig:1.0.0"
 <dependency>
     <groupId>dev.nohus</groupId>
     <artifactId>AutoKonfig</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
-The artifacts are available on JCenter.
+The artifacts are available on Maven Central.
 
 ## Simple example
 
