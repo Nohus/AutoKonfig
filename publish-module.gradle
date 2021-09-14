@@ -1,0 +1,71 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.java.srcDirs
+    from sourceSets.main.kotlin.srcDirs
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveClassifier.set('javadoc')
+    from dokkaJavadoc.outputDirectory
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+group = "dev.nohus"
+version = "1.0.1"
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId "dev.nohus.autokonfig"
+                artifactId "AutoKonfig"
+                version "1.0.1"
+
+                from components.java
+
+                artifact sourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = "AutoKonfig"
+                    description = "Kotlin configuration library with batteries included"
+                    url = "https://autokonfig.nohus.dev/"
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "Nohus"
+                            name = "Marcin Wisniowski"
+                            url = "https://nohus.dev/"
+                        }
+                    }
+                    scm {
+                        connection = "scm:git:git://github.com/Nohus/AutoKonfig.git"
+                        developerConnection = "scm:git:git://github.com/Nohus/AutoKonfig.git"
+                        url = "https://github.com/Nohus/AutoKonfig"
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            rootProject.ext["signing.keyId"],
+            rootProject.ext["signing.key"],
+            rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}

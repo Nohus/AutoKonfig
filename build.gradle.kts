@@ -16,8 +16,14 @@ buildscript {
 
 plugins {
     kotlin("jvm") version "1.5.30"
-    `maven-publish`
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("com.diffplug.spotless") version "5.15.0"
+    id("org.jetbrains.dokka") version "1.5.0"
+}
+
+apply {
+    from("${rootDir}/publish-root.gradle")
+    from("${rootDir}/publish-module.gradle")
 }
 
 repositories {
@@ -39,79 +45,8 @@ tasks.test {
     useJUnitPlatform()
 }
 
-object Setting {
-    const val packageName = "dev.nohus.autokonfig"
-    const val group = "dev.nohus"
-    const val artifact = "AutoKonfig"
-    const val version = "1.0.0"
-}
-
-group = Setting.group
-version = Setting.version
-
 spotless {
     kotlin {
         ktlint("0.42.1")
     }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = Setting.group
-            artifactId = Setting.artifact
-            version = Setting.version
-
-            from(components["java"])
-
-            pom {
-                name.set("AutoKonfig")
-                description.set("Kotlin configuration library with batteries included")
-                url.set("https://autokonfig.nohus.dev/")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/Nohus/AutoKonfig.git")
-                    developerConnection.set("scm:git:git://github.com/Nohus/AutoKonfig.git")
-                    url.set("https://github.com/Nohus/AutoKonfig")
-                }
-                developers {
-                    developer {
-                        id.set("Nohus")
-                        name.set("Marcin Wisniowski")
-                        url.set("https://nohus.dev/")
-                    }
-                }
-            }
-        }
-    }
-}
-
-tasks.register<Jar>("sourcesJar") {
-    from(sourceSets["main"].allSource)
-    classifier = "sources"
-}
-
-tasks.register("copyPom") {
-    outputs.upToDateWhen { false }
-    doLast {
-        copy {
-            from("build/publications/maven") {
-                include("pom-default.xml")
-            }
-            into("build/libs/")
-            rename("pom-default.xml", "${Setting.artifact}-${Setting.version}.pom")
-        }
-    }
-}
-
-tasks.register("buildArtifacts") {
-    this.finalizedBy(tasks.findByPath("jar"))
-    this.finalizedBy(tasks.findByPath("sourcesJar"))
-    this.finalizedBy(tasks.findByPath("generatePomFileForMavenPublication"))
-    this.finalizedBy(tasks.findByPath("copyPom"))
 }

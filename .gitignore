@@ -31,3 +31,5 @@ build/
 
 # Source repo for the mkdocs material theme
 mkdocs-material/
+
+local.properties
