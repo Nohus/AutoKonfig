@@ -53,9 +53,9 @@ private fun mapDouble(value: Value) = try { value.simple.toDouble() } catch (e: 
 private fun mapBigInteger(value: Value) = try { value.simple.toBigInteger() } catch (e: NumberFormatException) { throw SettingParseException("must be a BigInteger number", e) }
 private fun mapBigDecimal(value: Value) = try { value.simple.toBigDecimal() } catch (e: NumberFormatException) { throw SettingParseException("must be a BigDecimal number", e) }
 private fun <T : Enum<T>> mapEnum(value: Value, enum: Class<T>): T {
-    val map = enum.enumConstants.map { it.name to it }.toMap()
+    val map = enum.enumConstants.associateBy { it.name }
     return try {
-        map[value.simple] ?: map.entries.first { it.key.toLowerCase(Locale.US) == value.simple.toLowerCase(Locale.US) }.value
+        map[value.simple] ?: map.entries.first { it.key.equals(value.simple, ignoreCase = true) }.value
     } catch (e: NoSuchElementException) {
         throw SettingParseException("possible values are ${map.keys}", e)
     }

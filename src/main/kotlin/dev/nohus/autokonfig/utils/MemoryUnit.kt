@@ -9,6 +9,7 @@ import java.math.BigInteger
 /**
  * Adapted from Typesafe Config
  */
+@Suppress("unused")
 internal enum class MemoryUnit(val prefix: String, val powerOf: Int, val power: Int) {
     BYTES("", 1024, 0),
     KILOBYTES("kilo", 1000, 1),
@@ -34,7 +35,7 @@ internal enum class MemoryUnit(val prefix: String, val powerOf: Int, val power: 
         val unitsMap by lazy { createUnitsMap() }
 
         private fun createUnitsMap(): Map<List<String>, MemoryUnit> {
-            return values().map { unit ->
+            return values().associateBy { unit ->
                 val units = mutableListOf<String>()
                 units += unit.prefix + "byte"
                 units += unit.prefix + "bytes"
@@ -61,8 +62,8 @@ internal enum class MemoryUnit(val prefix: String, val powerOf: Int, val power: 
                         }
                     }
                 }
-                units to unit
-            }.toMap()
+                units
+            }
         }
     }
 }

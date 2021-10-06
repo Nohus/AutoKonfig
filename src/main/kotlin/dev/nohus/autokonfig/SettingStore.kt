@@ -43,7 +43,7 @@ internal class SettingStore {
 
     fun getAll(): Map<String, String> {
         val map = mutableMapOf<String, String>()
-        map += properties.entries.map { it.key.toString() to it.value.toString() }.toMap()
+        map += properties.entries.associate { it.key to it.value.toString() }
         map += flags.map { it to true.toString() }
         return map
     }
@@ -57,7 +57,7 @@ internal class SettingStore {
 
     private fun findMatchingKeyIgnoringCase(key: String): String? {
         val lowerKey = key.toLowerCase(Locale.US)
-        return properties.keys.firstOrNull { it.toString().toLowerCase(Locale.US) == lowerKey }
+        return properties.keys.firstOrNull { it.toLowerCase(Locale.US) == lowerKey }
             ?.toString() ?: flags.firstOrNull { it.toLowerCase(Locale.US) == lowerKey }
     }
 

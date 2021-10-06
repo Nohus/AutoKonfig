@@ -113,7 +113,7 @@ fun AutoKonfig.withProperties(
     properties: Properties,
     source: String = SourceUtil.getReflectiveSource("properties")
 ) = apply {
-    withMap(properties.map { it.key.toString() to it.value.toString() }.toMap(), source)
+    withMap(properties.entries.associate { it.key.toString() to it.value.toString() }, source)
 }
 
 fun AutoKonfig.withMap(
