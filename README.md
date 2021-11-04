@@ -6,7 +6,7 @@ Kotlin configuration library with batteries included.
 
 [![License](https://img.shields.io/badge/license-Apache%202%20-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/Nohus/AutoKonfig/tree/master/src/test/kotlin/dev/nohus/autokonfig)
-[![Version](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Fdev%2Fnohus%2Fautokonfig%2FAutoKonfig%2Fmaven-metadata.xml)](https://search.maven.org/artifact/dev.nohus.autokonfig/AutoKonfig)
+[![Version](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Fdev%2Fnohus%2FAutoKonfig%2Fmaven-metadata.xml)](https://search.maven.org/artifact/dev.nohus/AutoKonfig)
 
 ## Website
 [https://autokonfig.nohus.dev/](https://autokonfig.nohus.dev/)
