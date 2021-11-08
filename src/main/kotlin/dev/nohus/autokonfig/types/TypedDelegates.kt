@@ -77,8 +77,8 @@ open class Group(name: String? = null) {
 
     val fullName: String by lazy {
         val names = mutableListOf<String>()
-        var parentClass = javaClass.enclosingClass
-        while (parentClass.superclass.simpleName == "Group") {
+        var parentClass: Class<*>? = javaClass.enclosingClass
+        while (parentClass?.superclass?.simpleName == "Group") {
             (parentClass.kotlin.objectInstance as? Group)?.effectiveName?.let { names += it }
             parentClass = parentClass.enclosingClass
         }
