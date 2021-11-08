@@ -26,7 +26,7 @@ depending on which type is asked for
 
 #### Gradle
 ``` Groovy
-implementation "dev.nohus:AutoKonfig:1.0.2"
+implementation "dev.nohus:AutoKonfig:1.0.3"
 ```
 
 #### Maven
@@ -34,7 +34,7 @@ implementation "dev.nohus:AutoKonfig:1.0.2"
 <dependency>
     <groupId>dev.nohus</groupId>
     <artifactId>AutoKonfig</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
