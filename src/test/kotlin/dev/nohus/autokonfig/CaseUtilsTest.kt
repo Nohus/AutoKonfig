@@ -3,7 +3,7 @@ package dev.nohus.autokonfig
 import dev.nohus.autokonfig.utils.CaseUtils.toKebabCase
 import dev.nohus.autokonfig.utils.CaseUtils.toSnakeCase
 import io.kotest.core.spec.style.FreeSpec
-import org.junit.jupiter.api.Assertions.assertEquals
+import io.kotest.matchers.shouldBe
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 05/01/2020.
@@ -11,19 +11,27 @@ import org.junit.jupiter.api.Assertions.assertEquals
 
 class CaseUtilsTest : FreeSpec({
 
-    "converts to snake case" {
-        assertEquals("a", "a".toSnakeCase())
-        assertEquals("a_b", "aB".toSnakeCase())
-        assertEquals("a_bc", "aBc".toSnakeCase())
-        assertEquals("a_bc_d", "aBcD".toSnakeCase())
-        assertEquals("abc", "Abc".toSnakeCase())
+    listOf(
+        "a" to "a",
+        "aB" to "a_b",
+        "aBc" to "a_bc",
+        "aBcD" to "a_bc_d",
+        "Abc" to "abc"
+    ).forEach { (from, expected) ->
+        "converts $from to snake case $expected" {
+            from.toSnakeCase() shouldBe expected
+        }
     }
 
-    "converts to kebab case" {
-        assertEquals("a", "a".toKebabCase())
-        assertEquals("a-b", "aB".toKebabCase())
-        assertEquals("a-bc", "aBc".toKebabCase())
-        assertEquals("a-bc-d", "aBcD".toKebabCase())
-        assertEquals("abc", "Abc".toKebabCase())
+    listOf(
+        "a" to "a",
+        "aB" to "a-b",
+        "aBc" to "a-bc",
+        "aBcD" to "a-bc-d",
+        "Abc" to "abc"
+    ).forEach { (from, expected) ->
+        "converts $from to kebab case $expected" {
+            from.toKebabCase() shouldBe expected
+        }
     }
 })

@@ -45,11 +45,13 @@ import dev.nohus.autokonfig.types.getString
 import dev.nohus.autokonfig.utils.TestAutoKonfig
 import dev.nohus.autokonfig.utils.useAsHocon
 import dev.nohus.autokonfig.utils.useAsProperties
+import io.kotest.assertions.throwables.shouldThrowExactlyUnit
 import io.kotest.core.spec.style.FreeSpec
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.assertThrows
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.throwable.shouldHaveMessage
 import java.time.Duration
 import java.time.LocalTime
 import java.time.Period
@@ -82,14 +84,14 @@ class SettingsTypesTest : FreeSpec({
         val f by BooleanSetting()
         val g by BooleanSetting()
         val h by BooleanSetting()
-        assertTrue(a)
-        assertTrue(b)
-        assertTrue(c)
-        assertTrue(d)
-        assertFalse(e)
-        assertFalse(f)
-        assertFalse(g)
-        assertFalse(h)
+        a.shouldBeTrue()
+        b.shouldBeTrue()
+        c.shouldBeTrue()
+        d.shouldBeTrue()
+        e.shouldBeFalse()
+        f.shouldBeFalse()
+        g.shouldBeFalse()
+        h.shouldBeFalse()
     }
 
     "flag settings are false by default" {
@@ -98,8 +100,8 @@ class SettingsTypesTest : FreeSpec({
         """.useAsProperties(testAutoKonfig)
         val a by FlagSetting()
         val b by FlagSetting()
-        assertTrue(a)
-        assertFalse(b)
+        a.shouldBeTrue()
+        b.shouldBeFalse()
     }
 
     "settings of all basic types can be read" {
@@ -125,16 +127,16 @@ class SettingsTypesTest : FreeSpec({
         val bytes by BytesSetting()
         val boolean by BooleanSetting()
         val flag by FlagSetting()
-        assertEquals("hello", string)
-        assertEquals(10, int)
-        assertEquals(3000000000, long)
-        assertEquals(3.14f, float)
-        assertEquals(3.1415, double)
-        assertEquals("100000000000000000005".toBigInteger(), bigInteger)
-        assertEquals("100000000000000000005.00000002".toBigDecimal(), bigDecimal)
-        assertEquals(512000, bytes)
-        assertFalse(boolean)
-        assertTrue(flag)
+        string shouldBe "hello"
+        int shouldBe 10
+        long shouldBe 3000000000
+        float shouldBe 3.14f
+        double shouldBe 3.1415
+        bigInteger shouldBe "100000000000000000005".toBigInteger()
+        bigDecimal shouldBe "100000000000000000005.00000002".toBigDecimal()
+        bytes shouldBe 512000
+        boolean.shouldBeFalse()
+        flag.shouldBeTrue()
     }
 
     "settings of all basic types can be read in a group" {
@@ -150,16 +152,16 @@ class SettingsTypesTest : FreeSpec({
             typesGroup.boolean = false
             typesGroup.flag = true
         """.useAsProperties(testAutoKonfig)
-        assertEquals("hello", TypesGroup.string)
-        assertEquals(10, TypesGroup.int)
-        assertEquals(3000000000, TypesGroup.long)
-        assertEquals(3.14f, TypesGroup.float)
-        assertEquals(3.1415, TypesGroup.double)
-        assertEquals("100000000000000000005".toBigInteger(), TypesGroup.bigInteger)
-        assertEquals("100000000000000000005.00000002".toBigDecimal(), TypesGroup.bigDecimal)
-        assertEquals(512000, TypesGroup.bytes)
-        assertFalse(TypesGroup.boolean)
-        assertTrue(TypesGroup.flag)
+        TypesGroup.string shouldBe "hello"
+        TypesGroup.int shouldBe 10
+        TypesGroup.long shouldBe 3000000000
+        TypesGroup.float shouldBe 3.14f
+        TypesGroup.double shouldBe 3.1415
+        TypesGroup.bigInteger shouldBe "100000000000000000005".toBigInteger()
+        TypesGroup.bigDecimal shouldBe "100000000000000000005.00000002".toBigDecimal()
+        TypesGroup.bytes shouldBe 512000
+        TypesGroup.boolean.shouldBeFalse()
+        TypesGroup.flag.shouldBeTrue()
     }
 
     "settings of all basic types can be read directly" {
@@ -175,60 +177,54 @@ class SettingsTypesTest : FreeSpec({
             boolean = false
             flag = true
         """.useAsProperties(testAutoKonfig)
-        assertEquals("hello", AutoKonfig.getString("string"))
-        assertEquals(10, AutoKonfig.getInt("int"))
-        assertEquals(3000000000, AutoKonfig.getLong("long"))
-        assertEquals(3.14f, AutoKonfig.getFloat("float"))
-        assertEquals(3.1415, AutoKonfig.getDouble("double"))
-        assertEquals("100000000000000000005".toBigInteger(), AutoKonfig.getBigInteger("bigInteger"))
-        assertEquals("100000000000000000005.00000002".toBigDecimal(), AutoKonfig.getBigDecimal("bigDecimal"))
-        assertEquals(512000, AutoKonfig.getBytes("bytes"))
-        assertFalse(AutoKonfig.getBoolean("boolean"))
-        assertTrue(AutoKonfig.getFlag("flag"))
+        AutoKonfig.getString("string") shouldBe "hello"
+        AutoKonfig.getInt("int") shouldBe 10
+        AutoKonfig.getLong("long") shouldBe 3000000000
+        AutoKonfig.getFloat("float") shouldBe 3.14f
+        AutoKonfig.getDouble("double") shouldBe 3.1415
+        AutoKonfig.getBigInteger("bigInteger") shouldBe "100000000000000000005".toBigInteger()
+        AutoKonfig.getBigDecimal("bigDecimal") shouldBe "100000000000000000005.00000002".toBigDecimal()
+        AutoKonfig.getBytes("bytes") shouldBe 512000
+        AutoKonfig.getBoolean("boolean").shouldBeFalse()
+        AutoKonfig.getFlag("flag").shouldBeTrue()
     }
 
     "enum settings can be read" {
         """
             EnumGroup.setting = Alpha
         """.useAsProperties(testAutoKonfig)
-        assertEquals(Letters.Alpha, EnumGroup.setting)
-        assertEquals(Letters.Alpha, EnumGroup.settingJava)
+        EnumGroup.setting shouldBe Letters.Alpha
+        EnumGroup.settingJava shouldBe Letters.Alpha
     }
 
     "enum settings can be read directly" {
         """
             setting = Alpha
         """.useAsProperties(testAutoKonfig)
-        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
-        assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
+        AutoKonfig.getEnum(Letters::class, "setting") shouldBe Letters.Alpha
+        AutoKonfig.getEnum(Letters::class.java, "setting") shouldBe Letters.Alpha
     }
 
     "enum settings are case-insensitive" {
         """
             EnumGroup.setting = beTA
         """.useAsProperties(testAutoKonfig)
-        assertEquals(Letters.Beta, EnumGroup.setting)
-        assertEquals(Letters.Beta, EnumGroup.settingJava)
+        EnumGroup.setting shouldBe Letters.Beta
+        EnumGroup.settingJava shouldBe Letters.Beta
     }
 
     "invalid enum value throws an exception" {
         """
             setting = Gamma
         """.useAsProperties(testAutoKonfig)
-        val exception = assertThrows<AutoKonfigException> {
+        val exception = shouldThrowExactlyUnit<AutoKonfigException> {
             val setting by EnumSetting(Letters::class)
         }
-        val exceptionJava = assertThrows<AutoKonfigException> {
+        val exceptionJava = shouldThrowExactlyUnit<AutoKonfigException> {
             val settingJava by EnumSetting(Letters::class.java, name = "setting")
         }
-        assertEquals(
-            "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]",
-            exception.message
-        )
-        assertEquals(
-            "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]",
-            exceptionJava.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]"
+        exceptionJava shouldHaveMessage "Failed to parse setting \"setting\", the value is \"Gamma\", but possible values are [Alpha, Beta]"
     }
 
     "temporal settings can be read" {
@@ -246,12 +242,12 @@ class SettingsTypesTest : FreeSpec({
         val localTime by LocalTimeSetting()
         val localDate by LocalDateSetting()
         val localDateTime by LocalDateTimeSetting()
-        assertEquals("2011-12-03T10:15:30Z", instant.toString())
-        assertEquals(Duration.ofSeconds(10), duration)
-        assertEquals(Period.ofDays(10), period)
-        assertEquals("10:15:30", localTime.toString())
-        assertEquals("2020-01-09", localDate.toString())
-        assertEquals("2020-01-09T10:15:30", localDateTime.toString())
+        instant.toString() shouldBe "2011-12-03T10:15:30Z"
+        duration shouldBe Duration.ofSeconds(10)
+        period shouldBe Period.ofDays(10)
+        localTime.toString() shouldBe "10:15:30"
+        localDate.toString() shouldBe "2020-01-09"
+        localDateTime.toString() shouldBe "2020-01-09T10:15:30"
     }
 
     "temporal settings can be read in a group" {
@@ -263,12 +259,12 @@ class SettingsTypesTest : FreeSpec({
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
         """.useAsProperties(testAutoKonfig)
-        assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
-        assertEquals(Duration.ofSeconds(10), Temporal.duration)
-        assertEquals(Period.ofDays(10), Temporal.period)
-        assertEquals("10:15:30", Temporal.localTime.toString())
-        assertEquals("2020-01-09", Temporal.localDate.toString())
-        assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
+        Temporal.instant.toString() shouldBe "2011-12-03T10:15:30Z"
+        Temporal.duration shouldBe Duration.ofSeconds(10)
+        Temporal.period shouldBe Period.ofDays(10)
+        Temporal.localTime.toString() shouldBe "10:15:30"
+        Temporal.localDate.toString() shouldBe "2020-01-09"
+        Temporal.localDateTime.toString() shouldBe "2020-01-09T10:15:30"
     }
 
     "temporal settings can be read directly" {
@@ -279,11 +275,11 @@ class SettingsTypesTest : FreeSpec({
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
         """.useAsProperties(testAutoKonfig)
-        assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
-        assertEquals(Duration.ofSeconds(10), AutoKonfig.getDuration("duration"))
-        assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
-        assertEquals("2020-01-09", AutoKonfig.getLocalDate("local-date").toString())
-        assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
+        AutoKonfig.getInstant("instant").toString() shouldBe "2011-12-03T10:15:30Z"
+        AutoKonfig.getDuration("duration") shouldBe Duration.ofSeconds(10)
+        AutoKonfig.getLocalTime("local-time").toString() shouldBe "10:15:30"
+        AutoKonfig.getLocalDate("local-date").toString() shouldBe "2020-01-09"
+        AutoKonfig.getLocalDateTime("local-date-time").toString() shouldBe "2020-01-09T10:15:30"
     }
 
     "invalid temporal values throw exceptions" {
@@ -294,41 +290,26 @@ class SettingsTypesTest : FreeSpec({
             local-date = invalid
             local-date-time = invalid
         """.useAsProperties(testAutoKonfig)
-        var exception: AutoKonfigException = assertThrows {
+        var exception = shouldThrowExactlyUnit<AutoKonfigException> {
             val instant by InstantSetting()
         }
-        assertEquals(
-            "Failed to parse setting \"instant\", the value is \"invalid\", but must be an Instant",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"instant\", the value is \"invalid\", but must be an Instant"
+        exception = shouldThrowExactlyUnit {
             val duration by DurationSetting()
         }
-        assertEquals(
-            "Failed to parse setting \"duration\", the value is \"invalid\", but it is missing a number",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"duration\", the value is \"invalid\", but it is missing a number"
+        exception = shouldThrowExactlyUnit {
             val localTime by LocalTimeSetting()
         }
-        assertEquals(
-            "Failed to parse setting \"localTime\", the value is \"invalid\", but must be a LocalTime",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"localTime\", the value is \"invalid\", but must be a LocalTime"
+        exception = shouldThrowExactlyUnit {
             val localDate by LocalDateSetting()
         }
-        assertEquals(
-            "Failed to parse setting \"localDate\", the value is \"invalid\", but must be a LocalDate",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"localDate\", the value is \"invalid\", but must be a LocalDate"
+        exception = shouldThrowExactlyUnit {
             val localDateTime by LocalDateTimeSetting()
         }
-        assertEquals(
-            "Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"localDateTime\", the value is \"invalid\", but must be a LocalDateTime"
     }
 
     "LocalTime settings can be read" {
@@ -338,10 +319,10 @@ class SettingsTypesTest : FreeSpec({
             c = "07:20:40.5"
             d = "08:10:20.000000001"
         """.useAsHocon(testAutoKonfig)
-        assertEquals(LocalTime.of(5, 0), AutoKonfig.getLocalTime("a"))
-        assertEquals(LocalTime.of(22, 30), AutoKonfig.getLocalTime("b"))
-        assertEquals(LocalTime.of(7, 20, 40, 500000000), AutoKonfig.getLocalTime("c"))
-        assertEquals(LocalTime.of(8, 10, 20, 1), AutoKonfig.getLocalTime("d"))
+        AutoKonfig.getLocalTime("a") shouldBe LocalTime.of(5, 0)
+        AutoKonfig.getLocalTime("b") shouldBe LocalTime.of(22, 30)
+        AutoKonfig.getLocalTime("c") shouldBe LocalTime.of(7, 20, 40, 500000000)
+        AutoKonfig.getLocalTime("d") shouldBe LocalTime.of(8, 10, 20, 1)
     }
 
     "natural Duration settings can be read" {
@@ -354,13 +335,13 @@ class SettingsTypesTest : FreeSpec({
             long = 100000 days
             fraction = 0.5 day
         """.useAsHocon(testAutoKonfig)
-        assertEquals(Duration.ofMillis(10), AutoKonfig.getDuration("plain"))
-        assertEquals(Duration.ofSeconds(20), AutoKonfig.getDuration("unit"))
-        assertEquals(Duration.ofSeconds(25), AutoKonfig.getDuration("space"))
-        assertEquals(Duration.ofSeconds(30), AutoKonfig.getDuration("whitespace"))
-        assertEquals(Duration.ofNanos(50), AutoKonfig.getDuration("nanos"))
-        assertEquals(Duration.ofDays(100000), AutoKonfig.getDuration("long"))
-        assertEquals(Duration.ofHours(12), AutoKonfig.getDuration("fraction"))
+        AutoKonfig.getDuration("plain") shouldBe Duration.ofMillis(10)
+        AutoKonfig.getDuration("unit") shouldBe Duration.ofSeconds(20)
+        AutoKonfig.getDuration("space") shouldBe Duration.ofSeconds(25)
+        AutoKonfig.getDuration("whitespace") shouldBe Duration.ofSeconds(30)
+        AutoKonfig.getDuration("nanos") shouldBe Duration.ofNanos(50)
+        AutoKonfig.getDuration("long") shouldBe Duration.ofDays(100000)
+        AutoKonfig.getDuration("fraction") shouldBe Duration.ofHours(12)
     }
 
     "invalid natural Duration values throw exceptions" {
@@ -371,42 +352,26 @@ class SettingsTypesTest : FreeSpec({
             invalidNumber = 5.5.5 seconds
             unitFirst = seconds 10
         """.useAsProperties(testAutoKonfig)
-        var exception: AutoKonfigException = assertThrows {
+        var exception = shouldThrowExactlyUnit<AutoKonfigException> {
             AutoKonfig.getDuration("missing")
         }
-        assertEquals(
-            "Failed to parse setting \"missing\", the value is \"\", but it is missing a number",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"missing\", the value is \"\", but it is missing a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getDuration("onlyUnit")
         }
-        assertEquals(
-            "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getDuration("invalidUnit")
         }
-        assertEquals(
-            "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"ms\", \"millis\", \"milliseconds\", \"us\", \"micros\", \"microseconds\", \"ns\", \"nanos\", \"nanoseconds\", \"s\", \"second\", \"seconds\", \"m\", \"minute\", \"minutes\", \"h\", \"hour\", \"hours\", \"d\", \"day\", \"days\"]"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getDuration("invalidNumber")
         }
-        assertEquals(
-            "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 seconds\", but \"5.5.5\" is not a number",
-            exception.message
-        )
-
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 seconds\", but \"5.5.5\" is not a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getDuration("unitFirst")
         }
-        assertEquals(
-            "Failed to parse setting \"unitFirst\", the value is \"seconds 10\", but it is missing a number",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"unitFirst\", the value is \"seconds 10\", but it is missing a number"
     }
 
     "natural Period settings are parsed correctly" {
@@ -419,13 +384,13 @@ class SettingsTypesTest : FreeSpec({
             long = 100000 weeks
             fraction = 0.5 month
         """.useAsHocon(testAutoKonfig)
-        assertEquals(Period.ofDays(10), AutoKonfig.getPeriod("plain"))
-        assertEquals(Period.ofDays(600), AutoKonfig.getPeriod("unit"))
-        assertEquals(Period.ofWeeks(25), AutoKonfig.getPeriod("space"))
-        assertEquals(Period.ofDays(10950), AutoKonfig.getPeriod("whitespace"))
-        assertEquals(Period.ofDays(50), AutoKonfig.getPeriod("days"))
-        assertEquals(Period.ofWeeks(100000), AutoKonfig.getPeriod("long"))
-        assertEquals(Period.ofDays(15), AutoKonfig.getPeriod("fraction"))
+        AutoKonfig.getPeriod("plain") shouldBe Period.ofDays(10)
+        AutoKonfig.getPeriod("unit") shouldBe Period.ofDays(600)
+        AutoKonfig.getPeriod("space") shouldBe Period.ofWeeks(25)
+        AutoKonfig.getPeriod("whitespace") shouldBe Period.ofDays(10950)
+        AutoKonfig.getPeriod("days") shouldBe Period.ofDays(50)
+        AutoKonfig.getPeriod("long") shouldBe Period.ofWeeks(100000)
+        AutoKonfig.getPeriod("fraction") shouldBe Period.ofDays(15)
     }
 
     "invalid natural Period values throw exceptions" {
@@ -436,42 +401,26 @@ class SettingsTypesTest : FreeSpec({
             invalidNumber = 5.5.5 days
             unitFirst = days 10
         """.useAsProperties(testAutoKonfig)
-        var exception: AutoKonfigException = assertThrows {
+        var exception = shouldThrowExactlyUnit<AutoKonfigException> {
             AutoKonfig.getPeriod("missing")
         }
-        assertEquals(
-            "Failed to parse setting \"missing\", the value is \"\", but it is missing a number",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"missing\", the value is \"\", but it is missing a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getPeriod("onlyUnit")
         }
-        assertEquals(
-            "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"onlyUnit\", the value is \"days\", but it is missing a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getPeriod("invalidUnit")
         }
-        assertEquals(
-            "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"d\", \"day\", \"days\", \"w\", \"week\", \"weeks\", \"m\", \"month\", \"months\", \"y\", \"year\", \"years\"]",
-            exception.message
-        )
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"invalidUnit\", the value is \"5 whiles\", but the unit \"whiles\" must be one of [\"\", \"d\", \"day\", \"days\", \"w\", \"week\", \"weeks\", \"m\", \"month\", \"months\", \"y\", \"year\", \"years\"]"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getPeriod("invalidNumber")
         }
-        assertEquals(
-            "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 days\", but \"5.5.5\" is not a number",
-            exception.message
-        )
-
-        exception = assertThrows {
+        exception shouldHaveMessage "Failed to parse setting \"invalidNumber\", the value is \"5.5.5 days\", but \"5.5.5\" is not a number"
+        exception = shouldThrowExactlyUnit {
             AutoKonfig.getPeriod("unitFirst")
         }
-        assertEquals(
-            "Failed to parse setting \"unitFirst\", the value is \"days 10\", but it is missing a number",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"unitFirst\", the value is \"days 10\", but it is missing a number"
     }
 
     "bytes settings are parsed correctly" {
@@ -491,20 +440,20 @@ class SettingsTypesTest : FreeSpec({
             m = 1 megabytes
             n = 1 MB
         """.useAsHocon(testAutoKonfig)
-        assertEquals(1, AutoKonfig.getBytes("a"))
-        assertEquals(1, AutoKonfig.getBytes("b"))
-        assertEquals(1, AutoKonfig.getBytes("c"))
-        assertEquals(1, AutoKonfig.getBytes("d"))
-        assertEquals(1, AutoKonfig.getBytes("e"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("f"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("g"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("h"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("i"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("j"))
-        assertEquals(1_048_576, AutoKonfig.getBytes("k"))
-        assertEquals(1_000_000, AutoKonfig.getBytes("l"))
-        assertEquals(1_000_000, AutoKonfig.getBytes("m"))
-        assertEquals(1_000_000, AutoKonfig.getBytes("n"))
+        AutoKonfig.getBytes("a") shouldBe 1
+        AutoKonfig.getBytes("b") shouldBe 1
+        AutoKonfig.getBytes("c") shouldBe 1
+        AutoKonfig.getBytes("d") shouldBe 1
+        AutoKonfig.getBytes("e") shouldBe 1
+        AutoKonfig.getBytes("f") shouldBe 1_048_576
+        AutoKonfig.getBytes("g") shouldBe 1_048_576
+        AutoKonfig.getBytes("h") shouldBe 1_048_576
+        AutoKonfig.getBytes("i") shouldBe 1_048_576
+        AutoKonfig.getBytes("j") shouldBe 1_048_576
+        AutoKonfig.getBytes("k") shouldBe 1_048_576
+        AutoKonfig.getBytes("l") shouldBe 1_000_000
+        AutoKonfig.getBytes("m") shouldBe 1_000_000
+        AutoKonfig.getBytes("n") shouldBe 1_000_000
     }
 
     "list settings can be read" {
@@ -514,8 +463,8 @@ class SettingsTypesTest : FreeSpec({
         """.useAsHocon(testAutoKonfig)
         val strings by ListSetting(StringSettingType)
         val numbers by SetSetting(IntSettingType)
-        assertEquals(listOf("a", "b", "c"), strings)
-        assertEquals(setOf(1, 2, 3), numbers)
+        strings shouldContainExactly listOf("a", "b", "c")
+        numbers shouldContainExactly setOf(1, 2, 3)
     }
 
     "list settings can be read in a group" {
@@ -523,8 +472,8 @@ class SettingsTypesTest : FreeSpec({
             collections.strings = [a,b,c]
             collections.numbers = [1,2,3,2,1]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf("a", "b", "c"), Collections.strings)
-        assertEquals(setOf(1, 2, 3), Collections.numbers)
+        Collections.strings shouldContainExactly listOf("a", "b", "c")
+        Collections.numbers shouldContainExactly setOf(1, 2, 3)
     }
 
     "list settings can be read directly" {
@@ -532,8 +481,8 @@ class SettingsTypesTest : FreeSpec({
             strings = [a,b,c]
             numbers = [1,2,3]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
-        assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
+        AutoKonfig.getList(StringSettingType, "strings") shouldContainExactly listOf("a", "b", "c")
+        AutoKonfig.getSet(IntSettingType, "numbers") shouldContainExactly setOf(1, 2, 3)
     }
 
     "list settings with non-primitive types can be read" {
@@ -541,45 +490,36 @@ class SettingsTypesTest : FreeSpec({
             foo = [ 1 kB, 2 kilobytes, 3B ]
         """.useAsHocon(testAutoKonfig)
         val foo by ListSetting(BytesSettingType)
-        assertEquals(listOf(1000L, 2000L, 3L), foo)
+        foo shouldContainExactly listOf(1000L, 2000L, 3L)
     }
 
     "list settings with missing brackets throw exceptions" {
         """
             nested = [1,2,3]
         """.useAsHocon(testAutoKonfig)
-        val exception: AutoKonfigException = assertThrows {
+        val exception = shouldThrowExactlyUnit<AutoKonfigException> {
             val nested by ListSetting(ListSettingType(IntSettingType))
         }
-        assertEquals(
-            "Failed to parse setting \"nested\", the value is \"[1, 2, 3]\", but list element \"1\" is not a list",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"nested\", the value is \"[1, 2, 3]\", but list element \"1\" is not a list"
     }
 
     "list setting with a malformed value throws an exception" {
         """
             list = [1,2,c]
         """.useAsHocon(testAutoKonfig)
-        val exception: AutoKonfigException = assertThrows {
+        val exception = shouldThrowExactlyUnit<AutoKonfigException> {
             val list by ListSetting(IntSettingType)
         }
-        assertEquals(
-            "Failed to parse setting \"list\", the value is \"[1, 2, c]\", but list element \"c\" must be an Int number",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"list\", the value is \"[1, 2, c]\", but list element \"c\" must be an Int number"
     }
 
     "list setting with unexpected complex type throws an exception" {
         """
             list = [{a: 1}]
         """.useAsHocon(testAutoKonfig)
-        val exception: AutoKonfigException = assertThrows {
+        val exception = shouldThrowExactlyUnit<AutoKonfigException> {
             val list by ListSetting(IntSettingType)
         }
-        assertEquals(
-            "Failed to parse setting \"list\", the value is \"[{a=1}]\", but list element \"{a=1}\" is unexpectedly of type \"object\"",
-            exception.message
-        )
+        exception shouldHaveMessage "Failed to parse setting \"list\", the value is \"[{a=1}]\", but list element \"{a=1}\" is unexpectedly of type \"object\""
     }
 })

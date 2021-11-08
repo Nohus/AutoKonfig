@@ -10,7 +10,8 @@ import dev.nohus.autokonfig.types.getString
 import dev.nohus.autokonfig.utils.TestAutoKonfig
 import dev.nohus.autokonfig.utils.useAsHocon
 import io.kotest.core.spec.style.FreeSpec
-import org.junit.jupiter.api.Assertions.assertEquals
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
 import java.io.File
 
 /**
@@ -31,7 +32,7 @@ class ParsingTest : FreeSpec({
                 }
             }
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf(12), AutoKonfig.getList(IntSettingType, "foo.baz"))
+        AutoKonfig.getList(IntSettingType, "foo.baz") shouldContainExactly listOf(12)
     }
 
     "parses hocon" {
@@ -41,14 +42,14 @@ class ParsingTest : FreeSpec({
                 baz = 12
             }
         """.useAsHocon(testAutoKonfig)
-        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+        AutoKonfig.getInt("foo.baz") shouldBe 12
     }
 
     "parses multiple keys in a single line" {
         """
             foo.bar=10, foo.baz=12
         """.useAsHocon(testAutoKonfig)
-        assertEquals(12, AutoKonfig.getInt("foo.baz"))
+        AutoKonfig.getInt("foo.baz") shouldBe 12
     }
 
     "parses substitutions" {
@@ -56,7 +57,7 @@ class ParsingTest : FreeSpec({
             foo = 15
             bar = ${'$'}{foo}
         """.useAsHocon(testAutoKonfig)
-        assertEquals(15, AutoKonfig.getInt("bar"))
+        AutoKonfig.getInt("bar") shouldBe 15
     }
 
     "parses arrays" {
@@ -65,9 +66,9 @@ class ParsingTest : FreeSpec({
             bar = [1,2,3,]
             baz = [1, 2, 3, ]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "foo"))
-        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "bar"))
-        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "baz"))
+        AutoKonfig.getList(IntSettingType, "foo") shouldContainExactly listOf(1, 2, 3)
+        AutoKonfig.getList(IntSettingType, "bar") shouldContainExactly listOf(1, 2, 3)
+        AutoKonfig.getList(IntSettingType, "baz") shouldContainExactly listOf(1, 2, 3)
     }
 
     "parses arrays with substitutions" {
@@ -78,7 +79,7 @@ class ParsingTest : FreeSpec({
             d = 4
             foo = [ ${'$'}{a} ${'$'}{b}, ${'$'}{c} ${'$'}{d} ]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf("1 2", "3 4"), AutoKonfig.getList(StringSettingType, "foo"))
+        AutoKonfig.getList(StringSettingType, "foo") shouldContainExactly listOf("1 2", "3 4")
     }
 
     "parses multi-line arrays" {
@@ -87,7 +88,7 @@ class ParsingTest : FreeSpec({
                     2
                     3 ]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf(1, 2, 3), AutoKonfig.getList(IntSettingType, "foo"))
+        AutoKonfig.getList(IntSettingType, "foo") shouldContainExactly listOf(1, 2, 3)
     }
 
     "parses nested arrays" {
@@ -95,8 +96,8 @@ class ParsingTest : FreeSpec({
             foo = [ [ 1 ] ]
             bar = [ [1,2], [3,4] ]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf(listOf(1)), AutoKonfig.getList(ListSettingType(IntSettingType), "foo"))
-        assertEquals(listOf(listOf(1, 2), listOf(3, 4)), AutoKonfig.getList(ListSettingType(IntSettingType), "bar"))
+        AutoKonfig.getList(ListSettingType(IntSettingType), "foo") shouldContainExactly listOf(listOf(1))
+        AutoKonfig.getList(ListSettingType(IntSettingType), "bar") shouldContainExactly listOf(listOf(1, 2), listOf(3, 4))
     }
 
     "parses plus-equals arrays" {
@@ -104,7 +105,7 @@ class ParsingTest : FreeSpec({
             foo = [ 1 ]
             foo += 2
         """.useAsHocon(testAutoKonfig)
-        assertEquals(listOf(1, 2), AutoKonfig.getList(IntSettingType, "foo"))
+        AutoKonfig.getList(IntSettingType, "foo") shouldContainExactly listOf(1, 2)
     }
 
     "parses comments" {
@@ -113,7 +114,7 @@ class ParsingTest : FreeSpec({
             # b
             foo = 15 // c
         """.useAsHocon(testAutoKonfig)
-        assertEquals(15, AutoKonfig.getInt("foo"))
+        AutoKonfig.getInt("foo") shouldBe 15
     }
 
     "fields overwrite previous fields with the same key" {
@@ -121,7 +122,7 @@ class ParsingTest : FreeSpec({
             foo = 10
             foo = 20
         """.useAsHocon(testAutoKonfig)
-        assertEquals(20, AutoKonfig.getInt("foo"))
+        AutoKonfig.getInt("foo") shouldBe 20
     }
 
     "objects with the same key merge" {
@@ -129,9 +130,9 @@ class ParsingTest : FreeSpec({
             foo { a:1, b:2 }
             foo { b:3, c:4 }
         """.useAsHocon(testAutoKonfig)
-        assertEquals(1, AutoKonfig.getInt("foo.a"))
-        assertEquals(3, AutoKonfig.getInt("foo.b"))
-        assertEquals(4, AutoKonfig.getInt("foo.c"))
+        AutoKonfig.getInt("foo.a") shouldBe 1
+        AutoKonfig.getInt("foo.b") shouldBe 3
+        AutoKonfig.getInt("foo.c") shouldBe 4
     }
 
     "parses multi-line strings" {
@@ -139,7 +140,7 @@ class ParsingTest : FreeSpec({
             foo = ${"\"\"\""}a
             b${"\"\"\"\""}
         """.useAsHocon(testAutoKonfig)
-        assertEquals("a\nb\"", AutoKonfig.getString("foo"))
+        AutoKonfig.getString("foo") shouldBe "a\nb\""
     }
 
     "parses concatenated strings" {
@@ -148,9 +149,9 @@ class ParsingTest : FreeSpec({
             bar = 100 c
             key with spaces = 20
         """.useAsHocon(testAutoKonfig)
-        assertEquals("foo bar baz", AutoKonfig.getString("foo"))
-        assertEquals("100 c", AutoKonfig.getString("bar"))
-        assertEquals(20, AutoKonfig.getInt("key with spaces"))
+        AutoKonfig.getString("foo") shouldBe "foo bar baz"
+        AutoKonfig.getString("bar") shouldBe "100 c"
+        AutoKonfig.getInt("key with spaces") shouldBe 20
     }
 
     "parses concatenated objects" {
@@ -158,9 +159,9 @@ class ParsingTest : FreeSpec({
             foo = { a:1 } { b:2 }
             bar = [ 1, 2 ] [ 3, 4 ]
         """.useAsHocon(testAutoKonfig)
-        assertEquals(1, AutoKonfig.getInt("foo.a"))
-        assertEquals(2, AutoKonfig.getInt("foo.b"))
-        assertEquals(listOf(1, 2, 3, 4), AutoKonfig.getList(IntSettingType, "bar"))
+        AutoKonfig.getInt("foo.a") shouldBe 1
+        AutoKonfig.getInt("foo.b") shouldBe 2
+        AutoKonfig.getList(IntSettingType, "bar") shouldBe listOf(1, 2, 3, 4)
     }
 
     "parses path expressions with quotes" {
@@ -168,13 +169,13 @@ class ParsingTest : FreeSpec({
             foo."bar.baz" = 10
             bar."".c = 20
         """.useAsHocon(testAutoKonfig)
-        assertEquals(10, AutoKonfig.getInt("foo.\"bar.baz\""))
-        assertEquals(20, AutoKonfig.getInt("bar.\"\".c"))
+        AutoKonfig.getInt("foo.\"bar.baz\"") shouldBe 10
+        AutoKonfig.getInt("bar.\"\".c") shouldBe 20
     }
 
     "parses includes" {
         AutoKonfig.withConfig(File("src/test/resources/test/include/main.conf"))
         val a by IntSetting(name = "root.a")
-        assertEquals(10, a)
+        a shouldBe 10
     }
 })
