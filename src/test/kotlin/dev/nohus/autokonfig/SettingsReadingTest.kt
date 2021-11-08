@@ -5,6 +5,7 @@ import dev.nohus.autokonfig.types.BigIntegerSetting
 import dev.nohus.autokonfig.types.BooleanSetting
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.StringSetting
+import dev.nohus.autokonfig.types.getInt
 import dev.nohus.autokonfig.utils.TestAutoKonfig
 import dev.nohus.autokonfig.utils.useAsProperties
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -74,19 +75,21 @@ class SettingsReadingTest : FreeSpec({
 
     "keys with different casing types are matched" {
         """
-            foo-bar = 5
-            TEST_DATA = 4
+            kebab-case = 1
+            SNAKE_CASE = 2
+            camelCase = 3
         """.useAsProperties(testAutoKonfig)
-        val a by IntSetting(name = "foo-bar")
-        val fooBar by IntSetting()
-        val b by IntSetting(name = "TEST_DATA")
-        val test_data by IntSetting()
-        val testData by IntSetting()
-        a shouldBe 5
-        fooBar shouldBe 5
-        b shouldBe 4
-        test_data shouldBe 4
-        testData shouldBe 4
+        AutoKonfig.getInt("kebab-case") shouldBe 1
+        AutoKonfig.getInt("KEBAB_CASE") shouldBe 1
+        AutoKonfig.getInt("kebabCase") shouldBe 1
+
+        AutoKonfig.getInt("snake-case") shouldBe 2
+        AutoKonfig.getInt("SNAKE_CASE") shouldBe 2
+        AutoKonfig.getInt("snakeCase") shouldBe 2
+
+        AutoKonfig.getInt("camel-case") shouldBe 3
+        AutoKonfig.getInt("CAMEL_CASE") shouldBe 3
+        AutoKonfig.getInt("camelCase") shouldBe 3
     }
 
     "keys can have custom names" {

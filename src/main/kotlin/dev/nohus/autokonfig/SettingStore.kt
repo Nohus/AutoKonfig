@@ -1,6 +1,7 @@
 package dev.nohus.autokonfig
 
 import dev.nohus.autokonfig.Value.SimpleValue
+import dev.nohus.autokonfig.utils.CaseUtils.toCamelCase
 import dev.nohus.autokonfig.utils.CaseUtils.toKebabCase
 import dev.nohus.autokonfig.utils.CaseUtils.toSnakeCase
 import java.util.Locale
@@ -62,7 +63,7 @@ internal class SettingStore {
     }
 
     private fun getKeyRepresentations(key: String): List<String> {
-        return listOf(key, key.toSnakeCase(), key.toKebabCase())
+        return listOf(key, key.toSnakeCase(), key.toKebabCase(), key.toCamelCase())
     }
 
     private fun getValue(key: String): Value? {
