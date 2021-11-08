@@ -10,7 +10,6 @@ import dev.nohus.autokonfig.types.DurationSetting
 import dev.nohus.autokonfig.types.EnumSetting
 import dev.nohus.autokonfig.types.FlagSetting
 import dev.nohus.autokonfig.types.FloatSetting
-import dev.nohus.autokonfig.types.Group
 import dev.nohus.autokonfig.types.InstantSetting
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.IntSettingType
@@ -43,10 +42,13 @@ import dev.nohus.autokonfig.types.getLong
 import dev.nohus.autokonfig.types.getPeriod
 import dev.nohus.autokonfig.types.getSet
 import dev.nohus.autokonfig.types.getString
+import dev.nohus.autokonfig.utils.TestAutoKonfig
+import dev.nohus.autokonfig.utils.useAsHocon
+import dev.nohus.autokonfig.utils.useAsProperties
+import io.kotest.core.spec.style.FreeSpec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.Duration
 import java.time.LocalTime
@@ -56,10 +58,12 @@ import java.time.Period
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.
  */
 
-class SettingsTypesTest : BaseAutoKonfigTest() {
+class SettingsTypesTest : FreeSpec({
 
-    @Test
-    fun `boolean settings can be read`() {
+    val testAutoKonfig = TestAutoKonfig()
+    listener(testAutoKonfig)
+
+    "boolean settings can be read" {
         """
             a = true
             b = Yes
@@ -69,7 +73,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             f = no
             g = oFf
             h = 0
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val a by BooleanSetting()
         val b by BooleanSetting()
         val c by BooleanSetting()
@@ -88,32 +92,17 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertFalse(h)
     }
 
-    @Test
-    fun `flag settings are false by default`() {
+    "flag settings are false by default" {
         """
             a = true
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val a by FlagSetting()
         val b by FlagSetting()
         assertTrue(a)
         assertFalse(b)
     }
 
-    object TypesGroup : Group() {
-        val string by StringSetting()
-        val int by IntSetting()
-        val long by LongSetting()
-        val float by FloatSetting()
-        val double by DoubleSetting()
-        val bigInteger by BigIntegerSetting()
-        val bigDecimal by BigDecimalSetting()
-        val bytes by BytesSetting()
-        val boolean by BooleanSetting()
-        val flag by FlagSetting()
-    }
-
-    @Test
-    fun `settings of all basic types can be read`() {
+    "settings of all basic types can be read" {
         """
             string = hello
             int = 10
@@ -125,7 +114,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             bytes = 512kB
             boolean = false
             flag = true
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val string by StringSetting()
         val int by IntSetting()
         val long by LongSetting()
@@ -148,8 +137,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertTrue(flag)
     }
 
-    @Test
-    fun `settings of all basic types can be read in a group`() {
+    "settings of all basic types can be read in a group" {
         """
             typesGroup.string = hello
             typesGroup.int = 10
@@ -161,7 +149,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             typesGroup.bytes = 512kB
             typesGroup.boolean = false
             typesGroup.flag = true
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("hello", TypesGroup.string)
         assertEquals(10, TypesGroup.int)
         assertEquals(3000000000, TypesGroup.long)
@@ -174,8 +162,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertTrue(TypesGroup.flag)
     }
 
-    @Test
-    fun `settings of all basic types can be read directly`() {
+    "settings of all basic types can be read directly" {
         """
             string = hello
             int = 10
@@ -187,7 +174,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             bytes = 512kB
             boolean = false
             flag = true
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("hello", AutoKonfig.getString("string"))
         assertEquals(10, AutoKonfig.getInt("int"))
         assertEquals(3000000000, AutoKonfig.getLong("long"))
@@ -200,47 +187,34 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertTrue(AutoKonfig.getFlag("flag"))
     }
 
-    private enum class Letters {
-        Alpha, Beta
-    }
-
-    private object EnumGroup : Group() {
-        val setting by EnumSetting(Letters::class)
-        val settingJava by EnumSetting(Letters::class.java, name = "setting")
-    }
-
-    @Test
-    fun `enum settings can be read`() {
+    "enum settings can be read" {
         """
             EnumGroup.setting = Alpha
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals(Letters.Alpha, EnumGroup.setting)
         assertEquals(Letters.Alpha, EnumGroup.settingJava)
     }
 
-    @Test
-    fun `enum settings can be read directly`() {
+    "enum settings can be read directly" {
         """
             setting = Alpha
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class, "setting"))
         assertEquals(Letters.Alpha, AutoKonfig.getEnum(Letters::class.java, "setting"))
     }
 
-    @Test
-    fun `enum settings are case-insensitive`() {
+    "enum settings are case-insensitive" {
         """
             EnumGroup.setting = beTA
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals(Letters.Beta, EnumGroup.setting)
         assertEquals(Letters.Beta, EnumGroup.settingJava)
     }
 
-    @Test
-    fun `invalid enum value throws an exception`() {
+    "invalid enum value throws an exception" {
         """
             setting = Gamma
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val exception = assertThrows<AutoKonfigException> {
             val setting by EnumSetting(Letters::class)
         }
@@ -257,8 +231,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `temporal settings can be read`() {
+    "temporal settings can be read" {
         """
             instant = 2011-12-03T10:15:30Z
             duration = 10s
@@ -266,7 +239,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val instant by InstantSetting()
         val duration by DurationSetting()
         val period by PeriodSetting()
@@ -281,17 +254,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals("2020-01-09T10:15:30", localDateTime.toString())
     }
 
-    private object Temporal : Group() {
-        val instant by InstantSetting()
-        val duration by DurationSetting()
-        val period by PeriodSetting()
-        val localTime by LocalTimeSetting()
-        val localDate by LocalDateSetting()
-        val localDateTime by LocalDateTimeSetting()
-    }
-
-    @Test
-    fun `temporal settings can be read in a group`() {
+    "temporal settings can be read in a group" {
         """
             temporal.instant = 2011-12-03T10:15:30Z
             temporal.duration = 10s
@@ -299,7 +262,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             temporal.local-time = 10:15:30
             temporal.local-date = 2020-01-09
             temporal.local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("2011-12-03T10:15:30Z", Temporal.instant.toString())
         assertEquals(Duration.ofSeconds(10), Temporal.duration)
         assertEquals(Period.ofDays(10), Temporal.period)
@@ -308,15 +271,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals("2020-01-09T10:15:30", Temporal.localDateTime.toString())
     }
 
-    @Test
-    fun `temporal settings can be read directly`() {
+    "temporal settings can be read directly" {
         """
             instant = 2011-12-03T10:15:30Z
             duration = 10s
             local-time = 10:15:30
             local-date = 2020-01-09
             local-date-time = 2020-01-09T10:15:30
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("2011-12-03T10:15:30Z", AutoKonfig.getInstant("instant").toString())
         assertEquals(Duration.ofSeconds(10), AutoKonfig.getDuration("duration"))
         assertEquals("10:15:30", AutoKonfig.getLocalTime("local-time").toString())
@@ -324,15 +286,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals("2020-01-09T10:15:30", AutoKonfig.getLocalDateTime("local-date-time").toString())
     }
 
-    @Test
-    fun `invalid temporal values throw exceptions`() {
+    "invalid temporal values throw exceptions" {
         """
             instant = invalid
             duration = invalid
             local-time = invalid
             local-date = invalid
             local-date-time = invalid
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         var exception: AutoKonfigException = assertThrows {
             val instant by InstantSetting()
         }
@@ -370,22 +331,20 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `LocalTime settings can be read`() {
+    "LocalTime settings can be read" {
         """
             a = "05:00"
             b = "22:30:00"
             c = "07:20:40.5"
             d = "08:10:20.000000001"
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(LocalTime.of(5, 0), AutoKonfig.getLocalTime("a"))
         assertEquals(LocalTime.of(22, 30), AutoKonfig.getLocalTime("b"))
         assertEquals(LocalTime.of(7, 20, 40, 500000000), AutoKonfig.getLocalTime("c"))
         assertEquals(LocalTime.of(8, 10, 20, 1), AutoKonfig.getLocalTime("d"))
     }
 
-    @Test
-    fun `natural Duration settings can be read`() {
+    "natural Duration settings can be read" {
         """
             plain = 10
             unit = 20s
@@ -394,7 +353,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             nanos = 50ns
             long = 100000 days
             fraction = 0.5 day
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(Duration.ofMillis(10), AutoKonfig.getDuration("plain"))
         assertEquals(Duration.ofSeconds(20), AutoKonfig.getDuration("unit"))
         assertEquals(Duration.ofSeconds(25), AutoKonfig.getDuration("space"))
@@ -404,15 +363,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(Duration.ofHours(12), AutoKonfig.getDuration("fraction"))
     }
 
-    @Test
-    fun `invalid natural Duration values throw exceptions`() {
+    "invalid natural Duration values throw exceptions" {
         """
             missing = 
             onlyUnit = days
             invalidUnit = 5 whiles
             invalidNumber = 5.5.5 seconds
             unitFirst = seconds 10
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         var exception: AutoKonfigException = assertThrows {
             AutoKonfig.getDuration("missing")
         }
@@ -451,8 +409,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `natural Period settings are parsed correctly`() {
+    "natural Period settings are parsed correctly" {
         """
             plain = 10
             unit = 20m
@@ -461,7 +418,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             days = 50day
             long = 100000 weeks
             fraction = 0.5 month
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(Period.ofDays(10), AutoKonfig.getPeriod("plain"))
         assertEquals(Period.ofDays(600), AutoKonfig.getPeriod("unit"))
         assertEquals(Period.ofWeeks(25), AutoKonfig.getPeriod("space"))
@@ -471,15 +428,14 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(Period.ofDays(15), AutoKonfig.getPeriod("fraction"))
     }
 
-    @Test
-    fun `invalid natural Period values throw exceptions`() {
+    "invalid natural Period values throw exceptions" {
         """
             missing = 
             onlyUnit = days
             invalidUnit = 5 whiles
             invalidNumber = 5.5.5 days
             unitFirst = days 10
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         var exception: AutoKonfigException = assertThrows {
             AutoKonfig.getPeriod("missing")
         }
@@ -518,8 +474,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `bytes settings are parsed correctly`() {
+    "bytes settings are parsed correctly" {
         """
             a = 1
             b = 1 b
@@ -535,7 +490,7 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             l = 1 megabyte
             m = 1 megabytes
             n = 1 MB
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(1, AutoKonfig.getBytes("a"))
         assertEquals(1, AutoKonfig.getBytes("b"))
         assertEquals(1, AutoKonfig.getBytes("c"))
@@ -552,57 +507,47 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         assertEquals(1_000_000, AutoKonfig.getBytes("n"))
     }
 
-    object Collections : Group() {
-        val strings by ListSetting(StringSettingType)
-        val numbers by SetSetting(IntSettingType)
-    }
-
-    @Test
-    fun `list settings can be read`() {
+    "list settings can be read" {
         """
             strings = [a,b,c]
             numbers = [1,2,3]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         val strings by ListSetting(StringSettingType)
         val numbers by SetSetting(IntSettingType)
         assertEquals(listOf("a", "b", "c"), strings)
         assertEquals(setOf(1, 2, 3), numbers)
     }
 
-    @Test
-    fun `list settings can be read in a group`() {
+    "list settings can be read in a group" {
         """
             collections.strings = [a,b,c]
             collections.numbers = [1,2,3,2,1]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(listOf("a", "b", "c"), Collections.strings)
         assertEquals(setOf(1, 2, 3), Collections.numbers)
     }
 
-    @Test
-    fun `list settings can be read directly`() {
+    "list settings can be read directly" {
         """
             strings = [a,b,c]
             numbers = [1,2,3]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         assertEquals(listOf("a", "b", "c"), AutoKonfig.getList(StringSettingType, "strings"))
         assertEquals(setOf(1, 2, 3), AutoKonfig.getSet(IntSettingType, "numbers"))
     }
 
-    @Test
-    fun `list settings with non-primitive types can be read`() {
+    "list settings with non-primitive types can be read" {
         """
             foo = [ 1 kB, 2 kilobytes, 3B ]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         val foo by ListSetting(BytesSettingType)
         assertEquals(listOf(1000L, 2000L, 3L), foo)
     }
 
-    @Test
-    fun `list settings with missing brackets throw exceptions`() {
+    "list settings with missing brackets throw exceptions" {
         """
             nested = [1,2,3]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         val exception: AutoKonfigException = assertThrows {
             val nested by ListSetting(ListSettingType(IntSettingType))
         }
@@ -612,11 +557,10 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `list setting with a malformed value throws an exception`() {
+    "list setting with a malformed value throws an exception" {
         """
             list = [1,2,c]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         val exception: AutoKonfigException = assertThrows {
             val list by ListSetting(IntSettingType)
         }
@@ -626,11 +570,10 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `list setting with unexpected complex type throws an exception`() {
+    "list setting with unexpected complex type throws an exception" {
         """
             list = [{a: 1}]
-        """.trimIndent().useAsHocon()
+        """.useAsHocon(testAutoKonfig)
         val exception: AutoKonfigException = assertThrows {
             val list by ListSetting(IntSettingType)
         }
@@ -639,4 +582,4 @@ class SettingsTypesTest : BaseAutoKonfigTest() {
             exception.message
         )
     }
-}
+})

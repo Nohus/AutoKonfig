@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 object LibraryVersions {
     const val kotlin = "1.5.30"
     const val typeSafeConfig = "1.4.1"
+    const val kotest = "4.6.3"
 }
 
 buildscript {
@@ -34,7 +35,8 @@ dependencies {
     implementation(kotlin("stdlib", LibraryVersions.kotlin))
     implementation(kotlin("reflect", LibraryVersions.kotlin))
     implementation("com.typesafe:config:${LibraryVersions.typeSafeConfig}")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("io.kotest:kotest-runner-junit5:${LibraryVersions.kotest}")
+    testImplementation("io.kotest:kotest-assertions-core:${LibraryVersions.kotest}")
 }
 
 tasks.withType<KotlinCompile> {

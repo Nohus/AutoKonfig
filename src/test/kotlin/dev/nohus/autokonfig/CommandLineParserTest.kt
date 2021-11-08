@@ -1,18 +1,17 @@
 package dev.nohus.autokonfig
 
 import dev.nohus.autokonfig.utils.CommandLineParser
+import io.kotest.core.spec.style.FreeSpec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 06/01/2020.
  */
 
-class CommandLineParserTest {
+class CommandLineParserTest : FreeSpec({
 
-    @Test
-    fun `parses values`() {
+    "parses values" {
         val map = CommandLineParser().parse(arrayOf("-a", "b", "--cfg", "d", "-g", "fg"))
         assertEquals(
             mapOf(
@@ -24,8 +23,7 @@ class CommandLineParserTest {
         )
     }
 
-    @Test
-    fun `parses flags`() {
+    "parses flags" {
         val map = CommandLineParser().parse(arrayOf("-a", "b", "-c", "--test"))
         assertEquals(
             mapOf(
@@ -37,14 +35,12 @@ class CommandLineParserTest {
         )
     }
 
-    @Test
-    fun `parses empty command line`() {
+    "parses empty command line" {
         val map = CommandLineParser().parse(arrayOf())
         assertTrue(map.isEmpty())
     }
 
-    @Test
-    fun `ignores values without keys`() {
+    "ignores values without keys" {
         val map = CommandLineParser().parse(arrayOf("-a", "foo", "bar", "--foo", "bar", "baz"))
         assertEquals(
             mapOf(
@@ -55,8 +51,7 @@ class CommandLineParserTest {
         )
     }
 
-    @Test
-    fun `parses quoted values`() {
+    "parses quoted values" {
         val map = CommandLineParser().parse(
             arrayOf("--a", "1", "2", "3", "--quoted", "this is quoted")
         )
@@ -68,4 +63,4 @@ class CommandLineParserTest {
             map
         )
     }
-}
+})

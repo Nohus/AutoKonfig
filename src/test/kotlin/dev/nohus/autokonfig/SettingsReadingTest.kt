@@ -3,12 +3,13 @@ package dev.nohus.autokonfig
 import dev.nohus.autokonfig.types.BigDecimalSetting
 import dev.nohus.autokonfig.types.BigIntegerSetting
 import dev.nohus.autokonfig.types.BooleanSetting
-import dev.nohus.autokonfig.types.Group
 import dev.nohus.autokonfig.types.IntSetting
 import dev.nohus.autokonfig.types.StringSetting
+import dev.nohus.autokonfig.utils.TestAutoKonfig
+import dev.nohus.autokonfig.utils.useAsProperties
+import io.kotest.core.spec.style.FreeSpec
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File
 
@@ -16,47 +17,46 @@ import java.io.File
  * Created by Marcin Wisniowski (Nohus) on 08/02/2020.
  */
 
-class SettingsReadingTest : BaseAutoKonfigTest() {
+class SettingsReadingTest : FreeSpec({
 
-    @Test
-    fun `setting can be read`() {
-        "setting = test".useAsProperties()
+    val testAutoKonfig = TestAutoKonfig()
+    listener(testAutoKonfig)
+
+    "setting can be read" {
+        "setting = test".useAsProperties(testAutoKonfig)
         val setting by DefaultAutoKonfig.StringSetting()
         assertEquals("test", setting)
     }
 
-    @Test
-    fun `multiple settings can be read`() {
+    "multiple settings can be read" {
         """
             foo = abc
             bar = def
             baz = ghi
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val foo by DefaultAutoKonfig.StringSetting()
         val baz by DefaultAutoKonfig.StringSetting()
         assertEquals("abc", foo)
         assertEquals("ghi", baz)
     }
 
-    @Test
-    fun `multiple settings can be read from default config`() {
+    "multiple settings can be read from default config" {
         """
             foo = abc
             bar = def
             baz = ghi
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val foo by StringSetting()
         val baz by StringSetting()
         assertEquals("abc", foo)
         assertEquals("ghi", baz)
     }
 
-    @Test
-    fun `keys are case-insensitive`() {
+    "keys are case-insensitive" {
         """
             FOO = abc
             bar = DEF
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val foo by StringSetting()
         val bar by StringSetting()
         val a by StringSetting(name = "foo")
@@ -69,12 +69,11 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         assertEquals("abc", c)
     }
 
-    @Test
-    fun `keys with different casing types are matched`() {
+    "keys with different casing types are matched" {
         """
             foo-bar = 5
             TEST_DATA = 4
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val a by IntSetting(name = "foo-bar")
         val fooBar by IntSetting()
         val b by IntSetting(name = "TEST_DATA")
@@ -87,75 +86,67 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         assertEquals(4, testData)
     }
 
-    @Test
-    fun `keys can have custom names`() {
+    "keys can have custom names" {
         """
             foo = abc
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val bar by StringSetting(name = "foo")
         assertEquals("abc", bar)
     }
 
-    @Test
-    fun `multiple variables be delegated to the same setting`() {
+    "multiple variables be delegated to the same setting" {
         """
             foo = abc
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         val foo by StringSetting()
         val bar by StringSetting(name = "foo")
         assertEquals("abc", foo)
         assertEquals("abc", bar)
     }
 
-    @Test
-    fun `setting can be read from system properties`() {
+    "setting can be read from system properties" {
         val key = "unit.test.system.property"
         val value = "value"
         System.setProperty(key, value)
-        resetDefaultAutoKonfig()
+        testAutoKonfig.resetDefaultAutoKonfig()
         val setting by StringSetting(name = key)
         assertEquals(value, setting)
     }
 
-    @Test
-    fun `setting can be read from environment variables`() {
+    "setting can be read from environment variables" {
         val key = "unit.test.environment.variable"
         val value = "value"
-        setEnvironmentVariable(key, value)
-        resetDefaultAutoKonfig()
+        testAutoKonfig.setEnvironmentVariable(key, value)
+        testAutoKonfig.resetDefaultAutoKonfig()
         val setting by StringSetting(name = key)
         assertEquals(value, setting)
     }
 
-    @Test
-    fun `setting can be read from config file in resources`() {
+    "setting can be read from config file in resources" {
         val config = AutoKonfig.withResourceConfig("resource.properties")
         val setting by config.StringSetting()
         assertEquals("resource", setting)
     }
 
-    @Test
-    fun `setting can be read from config file by URL`() {
+    "setting can be read from config file by URL" {
         """
             setting = test
-        """.trimIndent().useAsProperties()
-        AutoKonfig.withURLConfig(file.toURI().toURL())
+        """.useAsProperties(testAutoKonfig)
+        AutoKonfig.withURLConfig(testAutoKonfig.propertiesFile.toURI().toURL())
         val setting by StringSetting()
         assertEquals("test", setting)
     }
 
-    @Test
-    fun `setting can be read from config file by URL string`() {
+    "setting can be read from config file by URL string" {
         """
             setting = test
-        """.trimIndent().useAsProperties()
-        AutoKonfig.withURLConfig(file.toURI().toString())
+        """.useAsProperties(testAutoKonfig)
+        AutoKonfig.withURLConfig(testAutoKonfig.propertiesFile.toURI().toString())
         val setting by StringSetting()
         assertEquals("test", setting)
     }
 
-    @Test
-    fun `setting can be read from command line arguments`() {
+    "setting can be read from command line arguments" {
         val config = AutoKonfig.withCommandLineArguments(arrayOf("-a", "b", "-c"))
         val a by config.StringSetting()
         val c by config.BooleanSetting()
@@ -163,8 +154,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         assertTrue(c)
     }
 
-    @Test
-    fun `settings can be read from multiple files`() {
+    "settings can be read from multiple files" {
         val config = AutoKonfig.withConfigs(
             File("src/test/resources/test/multiple/application.properties"),
             File("src/test/resources/test/multiple/autokonfig.conf")
@@ -175,8 +165,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         assertEquals("def", bar)
     }
 
-    @Test
-    fun `settings can be read from a list of files`() {
+    "settings can be read from a list of files" {
         val config = AutoKonfig.withConfigs(
             listOf(
                 File("src/test/resources/test/multiple/application.properties"),
@@ -189,55 +178,33 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         assertEquals("def", bar)
     }
 
-    object groupA : Group() {
-        object subgroup : Group() {
-            val setting by StringSetting("")
-        }
-    }
-
-    @Test
-    fun `setting can be read in a group`() {
+    "setting can be read in a group" {
         """
             groupA.subgroup.setting = test
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("test", groupA.subgroup.setting)
     }
 
-    object groupB : Group("outer") {
-        object subgroup : Group("inner") {
-            val setting by StringSetting(name = "key")
-        }
-    }
-
-    @Test
-    fun `setting can be read in a group with custom names`() {
+    "setting can be read in a group with custom names" {
         """
             outer.inner.key = test
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("test", groupB.subgroup.setting)
     }
 
-    object groupC : Group("outer") {
-        object subgroup : Group() {
-            val setting by StringSetting()
-        }
-    }
-
-    @Test
-    fun `setting can be read in a group with some custom names`() {
+    "setting can be read in a group with some custom names" {
         """
             outer.subgroup.setting = test
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         assertEquals("test", groupC.subgroup.setting)
     }
 
-    @Test
-    fun `getAll returns all settings`() {
+    "getAll returns all settings" {
         """
             a = 1
             b = 2
-        """.trimIndent().useAsProperties()
-        AutoKonfig.clear().withConfig(file)
+        """.useAsProperties(testAutoKonfig)
+        AutoKonfig.clear().withConfig(testAutoKonfig.propertiesFile)
         assertEquals(
             mapOf(
                 "a" to "1",
@@ -247,17 +214,15 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `nonexistent setting throws an exception`() {
-        "".useAsProperties()
+    "nonexistent setting throws an exception" {
+        "".useAsProperties(testAutoKonfig)
         val exception = assertThrows<AutoKonfigException> {
             val nonexistent by StringSetting()
         }
         assertEquals("Required key \"nonexistent\" is missing", exception.message)
     }
 
-    @Test
-    fun `nonexistent config file throws an exception`() {
+    "nonexistent config file throws an exception" {
         val file = File("nonexistent")
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig.withConfig(file)
@@ -268,8 +233,7 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `nonexistent resources config file throws an exception`() {
+    "nonexistent resources config file throws an exception" {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig.withResourceConfig("nonexistent")
         }
@@ -279,16 +243,14 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `malformed URL config file throws an exception`() {
+    "malformed URL config file throws an exception" {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig.withURLConfig("fake://URL")
         }
         assertEquals("Failed to read malformed URL: fake://URL (unknown protocol: fake)", exception.message)
     }
 
-    @Test
-    fun `nonexistent URL config file throws an exception`() {
+    "nonexistent URL config file throws an exception" {
         val exception = assertThrows<AutoKonfigException> {
             AutoKonfig.withURLConfig("file://nonexistent")
         }
@@ -298,11 +260,10 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `wrong type of setting for value throws an exception`() {
+    "wrong type of setting for value throws an exception" {
         """
             foo = test
-        """.trimIndent().useAsProperties()
+        """.useAsProperties(testAutoKonfig)
         var exception: AutoKonfigException = assertThrows {
             val a by IntSetting(name = "foo")
         }
@@ -326,10 +287,9 @@ class SettingsReadingTest : BaseAutoKonfigTest() {
         )
     }
 
-    @Test
-    fun `invalid required include throws an exception`() {
+    "invalid required include throws an exception" {
         assertThrows<AutoKonfigException> {
             AutoKonfig.withConfig(File("src/test/resources/test/include/invalid.conf"))
         }
     }
-}
+})
