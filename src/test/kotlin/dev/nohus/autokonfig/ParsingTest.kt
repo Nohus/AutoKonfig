@@ -60,6 +60,14 @@ class ParsingTest : FreeSpec({
         AutoKonfig.getInt("bar") shouldBe 15
     }
 
+    "parses substitutions across groups" {
+        """
+           a.foo = 1
+           b.bar = ${'$'}{a.foo}
+        """.useAsHocon(testAutoKonfig)
+        AutoKonfig.getInt("b.bar") shouldBe 1
+    }
+
     "parses arrays" {
         """
             foo = [1,2,3]
