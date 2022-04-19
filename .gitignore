@@ -24,6 +24,8 @@
 .idea/**/gradle.xml
 .idea/**/libraries
 .gradle/
+# do not ignore gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.jar
 
 # IntelliJ
 out/
