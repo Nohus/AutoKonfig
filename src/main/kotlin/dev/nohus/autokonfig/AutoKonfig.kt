@@ -77,5 +77,5 @@ class AutoKonfig {
 
     fun <T> get(type: SettingType<T>, key: String, default: T? = null): T = getValue(key, type, default)
 
-    companion object {}
+    companion object
 }

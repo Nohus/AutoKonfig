@@ -69,6 +69,7 @@ fun FlagSetting(name: String? = null) = DefaultAutoKonfig.FlagSetting(name)
 /**
  * Setting groups
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class Group(name: String? = null) {
 
     private val effectiveName = name ?: javaClass.simplerName

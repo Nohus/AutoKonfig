@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.isAccessible
 class TestAutoKonfig : TestListener {
 
     val propertiesFile = File("autokonfig.properties")
-    val hoconFile = File("autokonfig.conf")
+    private val hoconFile = File("autokonfig.conf")
 
     fun useAsProperties(text: String) {
         propertiesFile.writeText(text)
