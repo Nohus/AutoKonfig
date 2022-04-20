@@ -10,6 +10,6 @@ enum class ComplexType {
     OBJECT, LIST;
 
     override fun toString(): String {
-        return super.toString().toLowerCase(Locale.US)
+        return super.toString().lowercase(Locale.US)
     }
 }

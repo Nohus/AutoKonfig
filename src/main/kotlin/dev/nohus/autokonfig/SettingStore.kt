@@ -57,9 +57,9 @@ internal class SettingStore {
     }
 
     private fun findMatchingKeyIgnoringCase(key: String): String? {
-        val lowerKey = key.toLowerCase(Locale.US)
-        return properties.keys.firstOrNull { it.toLowerCase(Locale.US) == lowerKey }
-            ?.toString() ?: flags.firstOrNull { it.toLowerCase(Locale.US) == lowerKey }
+        val lowerKey = key.lowercase(Locale.US)
+        return properties.keys.firstOrNull { it.lowercase(Locale.US) == lowerKey }
+            ?.toString() ?: flags.firstOrNull { it.lowercase(Locale.US) == lowerKey }
     }
 
     private fun getKeyRepresentations(key: String): List<String> {

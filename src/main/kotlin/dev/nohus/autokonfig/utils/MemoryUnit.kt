@@ -1,6 +1,7 @@
 package dev.nohus.autokonfig.utils
 
 import java.math.BigInteger
+import java.util.Locale
 
 /**
  * Created by Marcin Wisniowski (Nohus) on 12/01/2020.
@@ -45,7 +46,7 @@ internal enum class MemoryUnit(val prefix: String, val powerOf: Int, val power: 
                     units += ""
                 } else {
                     val first = unit.prefix.substring(0, 1)
-                    val firstUpper = first.toUpperCase()
+                    val firstUpper = first.uppercase(Locale.US)
                     when (unit.powerOf) {
                         1024 -> {
                             units += first // 512m
