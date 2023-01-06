@@ -43,6 +43,29 @@ fun AutoKonfig.BooleanSetting(default: Boolean? = null, name: String? = null) = 
 fun AutoKonfig.FlagSetting(name: String? = null) = BooleanSetting(false, name)
 
 /**
+ * Helpers for getting optional typed setting providers
+ */
+fun AutoKonfig.OptionalStringSetting(name: String? = null) = getNullableSettingProvider(StringSettingType, name, null)
+fun AutoKonfig.OptionalIntSetting(name: String? = null) = getNullableSettingProvider(IntSettingType, name, null)
+fun AutoKonfig.OptionalLongSetting(name: String? = null) = getNullableSettingProvider(LongSettingType, name, null)
+fun AutoKonfig.OptionalFloatSetting(name: String? = null) = getNullableSettingProvider(FloatSettingType, name, null)
+fun AutoKonfig.OptionalDoubleSetting(name: String? = null) = getNullableSettingProvider(DoubleSettingType, name, null)
+fun AutoKonfig.OptionalBigIntegerSetting(name: String? = null) = getNullableSettingProvider(BigIntegerSettingType, name, null)
+fun AutoKonfig.OptionalBigDecimalSetting(name: String? = null) = getNullableSettingProvider(BigDecimalSettingType, name, null)
+fun <T : Enum<T>> AutoKonfig.OptionalEnumSetting(enum: Class<T>, name: String? = null) = getNullableSettingProvider(EnumSettingType(enum), name, null)
+fun <T : Enum<T>> AutoKonfig.OptionalEnumSetting(enum: KClass<T>, name: String? = null) = OptionalEnumSetting(enum.java, name)
+fun AutoKonfig.OptionalInstantSetting(name: String? = null) = getNullableSettingProvider(InstantSettingType, name, null)
+fun AutoKonfig.OptionalDurationSetting(name: String? = null) = getNullableSettingProvider(DurationSettingType, name, null)
+fun AutoKonfig.OptionalPeriodSetting(name: String? = null) = getNullableSettingProvider(PeriodSettingType, name, null)
+fun AutoKonfig.OptionalLocalTimeSetting(name: String? = null) = getNullableSettingProvider(LocalTimeSettingType, name, null)
+fun AutoKonfig.OptionalLocalDateSetting(name: String? = null) = getNullableSettingProvider(LocalDateSettingType, name, null)
+fun AutoKonfig.OptionalLocalDateTimeSetting(name: String? = null) = getNullableSettingProvider(LocalDateTimeSettingType, name, null)
+fun <T> AutoKonfig.OptionalListSetting(type: SettingType<T>, name: String? = null) = getNullableSettingProvider(ListSettingType(type), name, null)
+fun <T> AutoKonfig.OptionalSetSetting(type: SettingType<T>, name: String? = null) = getNullableSettingProvider(SetSettingType(type), name, null)
+fun AutoKonfig.OptionalBytesSetting(name: String? = null) = getNullableSettingProvider(BytesSettingType, name, null)
+fun AutoKonfig.OptionalBooleanSetting(name: String? = null) = getNullableSettingProvider(BooleanSettingType, name, null)
+
+/**
  * Helpers for getting typed setting providers from the default AutoKonfig
  */
 fun StringSetting(default: String? = null, name: String? = null) = DefaultAutoKonfig.StringSetting(default, name)
@@ -65,6 +88,29 @@ fun <T> SetSetting(type: SettingType<T>, default: Set<T>? = null, name: String? 
 fun BytesSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.BytesSetting(default, name)
 fun BooleanSetting(default: Boolean? = null, name: String? = null) = DefaultAutoKonfig.BooleanSetting(default, name)
 fun FlagSetting(name: String? = null) = DefaultAutoKonfig.FlagSetting(name)
+
+/**
+ * Helpers for getting optional typed setting providers from the default AutoKonfig
+ */
+fun OptionalStringSetting(name: String? = null) = DefaultAutoKonfig.OptionalStringSetting(name)
+fun OptionalIntSetting(name: String? = null) = DefaultAutoKonfig.OptionalIntSetting(name)
+fun OptionalLongSetting(name: String? = null) = DefaultAutoKonfig.OptionalLongSetting(name)
+fun OptionalFloatSetting(name: String? = null) = DefaultAutoKonfig.OptionalFloatSetting(name)
+fun OptionalDoubleSetting(name: String? = null) = DefaultAutoKonfig.OptionalDoubleSetting(name)
+fun OptionalBigIntegerSetting(name: String? = null) = DefaultAutoKonfig.OptionalBigIntegerSetting(name)
+fun OptionalBigDecimalSetting(name: String? = null) = DefaultAutoKonfig.OptionalBigDecimalSetting(name)
+fun <T : Enum<T>> OptionalEnumSetting(enum: Class<T>, name: String? = null) = DefaultAutoKonfig.OptionalEnumSetting(enum, name)
+fun <T : Enum<T>> OptionalEnumSetting(enum: KClass<T>, name: String? = null) = DefaultAutoKonfig.OptionalEnumSetting(enum, name)
+fun OptionalInstantSetting(name: String? = null) = DefaultAutoKonfig.OptionalInstantSetting(name)
+fun OptionalDurationSetting(name: String? = null) = DefaultAutoKonfig.OptionalDurationSetting(name)
+fun OptionalPeriodSetting(name: String? = null) = DefaultAutoKonfig.OptionalPeriodSetting(name)
+fun OptionalLocalTimeSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalTimeSetting(name)
+fun OptionalLocalDateSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalDateSetting(name)
+fun OptionalLocalDateTimeSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalDateTimeSetting(name)
+fun <T> OptionalListSetting(type: SettingType<T>, name: String? = null) = DefaultAutoKonfig.OptionalListSetting(type, name)
+fun <T> OptionalSetSetting(type: SettingType<T>, name: String? = null) = DefaultAutoKonfig.OptionalSetSetting(type, name)
+fun OptionalBytesSetting(name: String? = null) = DefaultAutoKonfig.OptionalBytesSetting(name)
+fun OptionalBooleanSetting(name: String? = null) = DefaultAutoKonfig.OptionalBooleanSetting(name)
 
 /**
  * Setting groups
@@ -112,6 +158,29 @@ open class Group(name: String? = null) {
     fun AutoKonfig.FlagSetting(name: String? = null) = BooleanSetting(false, name)
 
     /**
+     * Helpers for getting optional typed setting providers
+     */
+    fun AutoKonfig.OptionalStringSetting(name: String? = null) = getNullableSettingProvider(StringSettingType, name, this@Group)
+    fun AutoKonfig.OptionalIntSetting(name: String? = null) = getNullableSettingProvider(IntSettingType, name, this@Group)
+    fun AutoKonfig.OptionalLongSetting(name: String? = null) = getNullableSettingProvider(LongSettingType, name, this@Group)
+    fun AutoKonfig.OptionalFloatSetting(name: String? = null) = getNullableSettingProvider(FloatSettingType, name, this@Group)
+    fun AutoKonfig.OptionalDoubleSetting(name: String? = null) = getNullableSettingProvider(DoubleSettingType, name, this@Group)
+    fun AutoKonfig.OptionalBigIntegerSetting(name: String? = null) = getNullableSettingProvider(BigIntegerSettingType, name, this@Group)
+    fun AutoKonfig.OptionalBigDecimalSetting(name: String? = null) = getNullableSettingProvider(BigDecimalSettingType, name, this@Group)
+    fun <T : Enum<T>> AutoKonfig.OptionalEnumSetting(enum: Class<T>, name: String? = null) = getNullableSettingProvider(EnumSettingType(enum), name, this@Group)
+    fun <T : Enum<T>> AutoKonfig.OptionalEnumSetting(enum: KClass<T>, name: String? = null) = OptionalEnumSetting(enum.java, name)
+    fun AutoKonfig.OptionalInstantSetting(name: String? = null) = getNullableSettingProvider(InstantSettingType, name, this@Group)
+    fun AutoKonfig.OptionalDurationSetting(name: String? = null) = getNullableSettingProvider(DurationSettingType, name, this@Group)
+    fun AutoKonfig.OptionalPeriodSetting(name: String? = null) = getNullableSettingProvider(PeriodSettingType, name, this@Group)
+    fun AutoKonfig.OptionalLocalTimeSetting(name: String? = null) = getNullableSettingProvider(LocalTimeSettingType, name, this@Group)
+    fun AutoKonfig.OptionalLocalDateSetting(name: String? = null) = getNullableSettingProvider(LocalDateSettingType, name, this@Group)
+    fun AutoKonfig.OptionalLocalDateTimeSetting(name: String? = null) = getNullableSettingProvider(LocalDateTimeSettingType, name, this@Group)
+    fun <T> AutoKonfig.OptionalListSetting(type: SettingType<T>, name: String? = null) = getNullableSettingProvider(ListSettingType(type), name, this@Group)
+    fun <T> AutoKonfig.OptionalSetSetting(type: SettingType<T>, name: String? = null) = getNullableSettingProvider(SetSettingType(type), name, this@Group)
+    fun AutoKonfig.OptionalBytesSetting(name: String? = null) = getNullableSettingProvider(BytesSettingType, name, this@Group)
+    fun AutoKonfig.OptionalBooleanSetting(name: String? = null) = getNullableSettingProvider(BooleanSettingType, name, this@Group)
+
+    /**
      * Helpers for getting typed setting providers from the default AutoKonfig
      */
     fun StringSetting(default: String? = null, name: String? = null) = DefaultAutoKonfig.StringSetting(default, name)
@@ -134,4 +203,27 @@ open class Group(name: String? = null) {
     fun BytesSetting(default: Long? = null, name: String? = null) = DefaultAutoKonfig.BytesSetting(default, name)
     fun BooleanSetting(default: Boolean? = null, name: String? = null) = DefaultAutoKonfig.BooleanSetting(default, name)
     fun FlagSetting(name: String? = null) = DefaultAutoKonfig.FlagSetting(name)
+
+    /**
+     * Helpers for getting optional typed setting providers from the default AutoKonfig
+     */
+    fun OptionalStringSetting(name: String? = null) = DefaultAutoKonfig.OptionalStringSetting(name)
+    fun OptionalIntSetting(name: String? = null) = DefaultAutoKonfig.OptionalIntSetting(name)
+    fun OptionalLongSetting(name: String? = null) = DefaultAutoKonfig.OptionalLongSetting(name)
+    fun OptionalFloatSetting(name: String? = null) = DefaultAutoKonfig.OptionalFloatSetting(name)
+    fun OptionalDoubleSetting(name: String? = null) = DefaultAutoKonfig.OptionalDoubleSetting(name)
+    fun OptionalBigIntegerSetting(name: String? = null) = DefaultAutoKonfig.OptionalBigIntegerSetting(name)
+    fun OptionalBigDecimalSetting(name: String? = null) = DefaultAutoKonfig.OptionalBigDecimalSetting(name)
+    fun <T : Enum<T>> OptionalEnumSetting(enum: Class<T>, name: String? = null) = DefaultAutoKonfig.OptionalEnumSetting(enum, name)
+    fun <T : Enum<T>> OptionalEnumSetting(enum: KClass<T>, name: String? = null) = DefaultAutoKonfig.OptionalEnumSetting(enum, name)
+    fun OptionalInstantSetting(name: String? = null) = DefaultAutoKonfig.OptionalInstantSetting(name)
+    fun OptionalDurationSetting(name: String? = null) = DefaultAutoKonfig.OptionalDurationSetting(name)
+    fun OptionalPeriodSetting(name: String? = null) = DefaultAutoKonfig.OptionalPeriodSetting(name)
+    fun OptionalLocalTimeSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalTimeSetting(name)
+    fun OptionalLocalDateSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalDateSetting(name)
+    fun OptionalLocalDateTimeSetting(name: String? = null) = DefaultAutoKonfig.OptionalLocalDateTimeSetting(name)
+    fun <T> OptionalListSetting(type: SettingType<T>, name: String? = null) = DefaultAutoKonfig.OptionalListSetting(type, name)
+    fun <T> OptionalSetSetting(type: SettingType<T>, name: String? = null) = DefaultAutoKonfig.OptionalSetSetting(type, name)
+    fun OptionalBytesSetting(name: String? = null) = DefaultAutoKonfig.OptionalBytesSetting(name)
+    fun OptionalBooleanSetting(name: String? = null) = DefaultAutoKonfig.OptionalBooleanSetting(name)
 }
