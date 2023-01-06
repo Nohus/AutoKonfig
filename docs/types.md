@@ -210,3 +210,9 @@ Pebibytes|1024<sup>5</sup>|`p`, `P`, `Pi`, `PiB`, `pebibyte`, `pebibytes`
 Exbibytes|1024<sup>6</sup>|`e`, `E`, `Ei`, `EiB`, `exbibyte`, `exbibytes`
 Zebibytes|1024<sup>7</sup>|`z`, `Z`, `Zi`, `ZiB`, `zebibyte`, `zebibytes`
 Yobibytes|1024<sup>8</sup>|`y`, `Y`, `Yi`, `YiB`, `yobibyte`, `yobibytes`
+
+## Optional types
+
+All delegates and getters have optional versions, which return `null` instead of throwing an exception for missing values.
+
+They follow the format of `OptionalXSetting()` and `getOptionalX()`. For example: `OptionalIntSetting()` and `getOptionalInt()`.

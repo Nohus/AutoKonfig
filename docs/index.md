@@ -16,6 +16,7 @@ Kotlin configuration library with batteries included.
 - Merging properties loaded from multiple sources
 - Automatically finding config files
 - Type-safe properties
+- Support for default and optional values
 - Many useful [property types](/types), including dates (`2020-02-02`), times (`10:15:30`), durations (`20s`) and memory sizes (`256 MB`)
 - Type-specific parsing, a value of `1` can be the string `"1"`, the integer `1`, or the boolean `true`
 depending on which type is asked for
@@ -110,13 +111,23 @@ message. Declaring a variable delegated to a missing property will fail-fast. Th
 
 ## Default values
 
-Missing properties can be allowed by specifying default values:
+Missing properties can use default values:
 
 ``` Kotlin
 val port by IntSetting(default = 8080)
 ```
 
 If the `port` property does not exist, the variable will return `8080` instead of throwing an exception.
+
+## Optional values
+
+Missing properties can be allowed with optional types:
+
+``` Kotlin
+val port by OptionalIntSetting()
+```
+
+If the `port` property does not exist, the variable will be null instead of throwing an exception.
 
 ## Setting groups
 

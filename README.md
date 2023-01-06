@@ -19,6 +19,7 @@ Kotlin configuration library with batteries included.
 - Merging properties loaded from multiple sources
 - Automatically finding config files
 - Type-safe properties
+- Support for default and optional values
 - Many useful [property types](https://autokonfig.nohus.dev/types), including dates (`2020-02-02`), times (`10:15:30`), durations (`20s`) and memory sizes (`256 MB`)
 - Type-specific parsing, a value of `1` can be the string `"1"`, the integer `1`, or the boolean `true`
 depending on which type is asked for
